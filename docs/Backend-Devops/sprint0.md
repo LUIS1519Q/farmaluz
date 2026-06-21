@@ -43,10 +43,10 @@
 ## Evidencia
 
 ### Diagrama de Arquitectura
-![Diagrama de Arquitectura](diagramas/diagrama_arquitectura.png)
+![Diagrama de Arquitectura](../diagramas/diagrama_arquitectura.png)
 
 ### Diagrama de Flujo End-to-End
-![Diagrama de Flujo End-to-End](diagramas/diagrama_flujo_endtoend.png)
+![Diagrama de Flujo End-to-End](../diagramas/diagrama_flujo_endtoend.png)
 
 ### Diagrama de Secuencia — Búsqueda de Medicamento
-![Diagrama de Secuencia](diagramas/diagrama_secuencia_busqueda.png)
+![Diagrama de Secuencia](../diagramas/diagrama_secuencia_busqueda.png)
