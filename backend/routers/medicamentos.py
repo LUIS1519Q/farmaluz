@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from models import MedicamentoGenerico # Importa tu modelo
 
 router = APIRouter(
     prefix="/medicamentos",
@@ -6,18 +7,19 @@ router = APIRouter(
 )
 
 medicamentos_mock = [
-    {"id": 1, "nombre": "Paracetamol 500mg", "precio_techo": 1.20, "farmacia": "Fybeca"},
-    {"id": 2, "nombre": "Ibuprofeno 400mg", "precio_techo": 1.85, "farmacia": "Cruz Azul"},
-    {"id": 3, "nombre": "Amoxicilina 500mg", "precio_techo": 3.50, "farmacia": "Fybeca"},
-    {"id": 4, "nombre": "Loratadina 10mg", "precio_techo": 2.10, "farmacia": "Cruz Azul"},
-    {"id": 5, "nombre": "Omeprazol 20mg", "precio_techo": 2.75, "farmacia": "Fybeca"},
+    MedicamentoGenerico(nombre="Paracetamol 500mg", principio_activo="Paracetamol", precio_referencial=1.20, laboratorio="Fybeca"),
+    MedicamentoGenerico(nombre="Ibuprofeno 400mg", principio_activo="Ibuprofeno", precio_referencial=1.85, laboratorio="Cruz Azul"),
+    MedicamentoGenerico(nombre="Amoxicilina 500mg", principio_activo="Amoxicilina", precio_referencial=3.50, laboratorio="Fybeca"),
+    MedicamentoGenerico(nombre="Loratadina 10mg", principio_activo="Loratadina", precio_referencial=2.10, laboratorio="Cruz Azul"),
+    MedicamentoGenerico(nombre="Omeprazol 20mg", principio_activo="Omeprazol", precio_referencial=2.75, laboratorio="Fybeca")z,
 ]
 
-@router.get("/")
+# Actualizar los endpoints para usar response_model
+@router.get("/", response_model=list[MedicamentoGenerico]) 
 def listar_medicamentos():
     return medicamentos_mock
 
-@router.get("/{medicamento_id}")
+@router.get("/{medicamento_id}", response_model=MedicamentoGenerico)
 def obtener_medicamento(medicamento_id: int):
     for med in medicamentos_mock:
         if med["id"] == medicamento_id:
