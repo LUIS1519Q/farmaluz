@@ -68,3 +68,4 @@ Evidencia — Día 2
 Evidencia — Día 3
 ![Pantalla de Busqueda Filtrada](../capturas/frontend/sprint1/dia3_busqueda_filtrada.png)
 ![Pantalla Detalle Medicamento](../capturas/frontend/sprint1/dia3_detalle_medicamento.png)
+![Pantalla Responsive](../capturas/frontend/sprint1/dia3_pantalla_responsive.png)
