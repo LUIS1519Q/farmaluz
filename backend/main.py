@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import medicamentos, precios, chatbot
+from backend.routers import medicamentos, precios, chatbot
 
 app = FastAPI(title="API FarmaLuz")
 
