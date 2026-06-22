@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "nombre_comercial": "Paracetamol Genfar",
+    "principio_activo": "Paracetamol",
+    "concentracion": "500mg",
+    "precio_techo": 1.50,
+    "precio_cobrado": 1.50,
+    "estado_semaforo": "VERDE",
+    "porcentaje_sobreprecio": 0
+  },
+  {
+    "id": "2",
+    "nombre_comercial": "Buprex Forte",
+    "principio_activo": "Ibuprofeno",
+    "concentracion": "400mg",
+    "precio_techo": 2.50,
+    "precio_cobrado": 4.50,
+    "estado_semaforo": "ROJO",
+    "porcentaje_sobreprecio": 80
+  },
+  {
+    "id": "3",
+    "nombre_comercial": "Amoxil",
+    "principio_activo": "Amoxicilina",
+    "concentracion": "500mg",
+    "precio_techo": 4.00,
+    "precio_cobrado": 8.00,
+    "estado_semaforo": "ROJO",
+    "porcentaje_sobreprecio": 100
+  },
+  {
+    "id": "4",
+    "nombre_comercial": "Glucophage",
+    "principio_activo": "Metformina",
+    "concentracion": "850mg",
+    "precio_techo": 6.50,
+    "precio_cobrado": 6.50,
+    "estado_semaforo": "VERDE",
+    "porcentaje_sobreprecio": 0
+  },
+  {
+    "id": "5",
+    "nombre_comercial": "Lomec",
+    "principio_activo": "Omeprazol",
+    "concentracion": "20mg",
+    "precio_techo": 5.00,
+    "precio_cobrado": 8.50,
+    "estado_semaforo": "ROJO",
+    "porcentaje_sobreprecio": 70
+  },
+  {
+    "id": "6",
+    "nombre_comercial": "Alercet",
+    "principio_activo": "Loratadina",
+    "concentracion": "10mg",
+    "precio_techo": 3.20,
+    "precio_cobrado": 3.20,
+    "estado_semaforo": "VERDE",
+    "porcentaje_sobreprecio": 0
+  },
+  {
+    "id": "7",
+    "nombre_comercial": "Eutirox",
+    "principio_activo": "Levotiroxina",
+    "concentracion": "100mcg",
+    "precio_techo": 4.50,
+    "precio_cobrado": 9.00,
+    "estado_semaforo": "ROJO",
+    "porcentaje_sobreprecio": 100
+  },
+  {
+    "id": "8",
+    "nombre_comercial": "Apronax",
+    "principio_activo": "Naproxeno",
+    "concentracion": "550mg",
+    "precio_techo": 3.00,
+    "precio_cobrado": 6.30,
+    "estado_semaforo": "ROJO",
+    "porcentaje_sobreprecio": 110
+  }
+]
