@@ -58,3 +58,14 @@ def crear_medicamento(medicamento: dict):
         "id": str(resultado.inserted_id),
         "mensaje": "Medicamento creado"
     }
+
+# Asegúrate de añadir esto a tu router en medicamentos.py
+
+@router.get("/genericos/{id}", tags=["Medicamentos"])
+def obtener_generico(id: str):
+    # Aquí irá tu lógica. Por ahora, un mock simple:
+    return {
+        "id": id,
+        "nombre": "Medicamento Genérico Mock",
+        "disponible": True
+    }
