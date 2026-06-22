@@ -1,27 +1,84 @@
 from fastapi import APIRouter, HTTPException
-from models import MedicamentoGenerico # Importa tu modelo
+from bson import ObjectId
+
+from backend.database import db
+
+from backend.models import MedicamentoGenerico # Asegúrate de este import arriba
 
 router = APIRouter(
     prefix="/medicamentos",
-    tags=["medicamentos"]
+    tags=["Medicamentos"]
 )
 
-medicamentos_mock = [
-    MedicamentoGenerico(nombre="Paracetamol 500mg", principio_activo="Paracetamol", precio_referencial=1.20, laboratorio="Fybeca"),
-    MedicamentoGenerico(nombre="Ibuprofeno 400mg", principio_activo="Ibuprofeno", precio_referencial=1.85, laboratorio="Cruz Azul"),
-    MedicamentoGenerico(nombre="Amoxicilina 500mg", principio_activo="Amoxicilina", precio_referencial=3.50, laboratorio="Fybeca"),
-    MedicamentoGenerico(nombre="Loratadina 10mg", principio_activo="Loratadina", precio_referencial=2.10, laboratorio="Cruz Azul"),
-    MedicamentoGenerico(nombre="Omeprazol 20mg", principio_activo="Omeprazol", precio_referencial=2.75, laboratorio="Fybeca")z,
-]
+# 1. Endpoint de Genéricos (Integrado con el modelo)
+@router.get("/genericos/{id}", response_model=MedicamentoGenerico)
+def obtener_generico(id: int):
+    # Aquí puedes añadir la lógica de DB real cuando la tengas
+    return {
+        "id": id,
+        "nombre": "Paracetamol",
+        "principio_activo": "Paracetamol",
+        "precio_techo": 0.50,
+        "farmacia": "Farmacia Central"
+    }
 
-# Actualizar los endpoints para usar response_model
-@router.get("/", response_model=list[MedicamentoGenerico]) 
-def listar_medicamentos():
-    return medicamentos_mock
+@router.get("/")
+def listar_medicamentos(nombre: str | None = None):
 
-@router.get("/{medicamento_id}", response_model=MedicamentoGenerico)
-def obtener_medicamento(medicamento_id: int):
-    for med in medicamentos_mock:
-        if med["id"] == medicamento_id:
-            return med
-    raise HTTPException(status_code=404, detail="Medicamento no encontrado")
+    filtro = {}
+
+    if nombre:
+        filtro["principio_activo"] = {
+            "$regex": nombre,
+            "$options": "i"
+        }
+
+    medicamentos = []
+
+    for med in db.medicamentos.find(filtro):
+
+        med["_id"] = str(med["_id"])
+
+        medicamentos.append(med)
+
+    return medicamentos
+
+
+@router.get("/{medicamento_id}")
+def obtener_medicamento(medicamento_id: str):
+
+    medicamento = db.medicamentos.find_one(
+        {"_id": ObjectId(medicamento_id)}
+    )
+
+    if not medicamento:
+        raise HTTPException(
+            status_code=404,
+            detail="Medicamento no encontrado"
+        )
+
+    medicamento["_id"] = str(medicamento["_id"])
+
+    return medicamento
+
+
+@router.post("/")
+def crear_medicamento(medicamento: dict):
+
+    resultado = db.medicamentos.insert_one(medicamento)
+
+    return {
+        "id": str(resultado.inserted_id),
+        "mensaje": "Medicamento creado"
+    }
+
+# Asegúrate de añadir esto a tu router en medicamentos.py
+
+@router.get("/genericos/{id}", tags=["Medicamentos"])
+def obtener_generico(id: str):
+    # Aquí irá tu lógica. Por ahora, un mock simple:
+    return {
+        "id": id,
+        "nombre": "Medicamento Genérico Mock",
+        "disponible": True
+    }
