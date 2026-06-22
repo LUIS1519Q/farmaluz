@@ -3,11 +3,24 @@ from bson import ObjectId
 
 from backend.database import db
 
+from backend.models import MedicamentoGenerico # Asegúrate de este import arriba
+
 router = APIRouter(
     prefix="/medicamentos",
     tags=["Medicamentos"]
 )
 
+# 1. Endpoint de Genéricos (Integrado con el modelo)
+@router.get("/genericos/{id}", response_model=MedicamentoGenerico)
+def obtener_generico(id: int):
+    # Aquí puedes añadir la lógica de DB real cuando la tengas
+    return {
+        "id": id,
+        "nombre": "Paracetamol",
+        "principio_activo": "Paracetamol",
+        "precio_techo": 0.50,
+        "farmacia": "Farmacia Central"
+    }
 
 @router.get("/")
 def listar_medicamentos(nombre: str | None = None):
