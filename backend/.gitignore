@@ -1,4 +1,18 @@
+# Archivos de entorno y secretos
+.env
+
+# Entornos virtuales
 venv/
+env/
+.venv/
+
+# Caché de Python
 __pycache__/
 *.pyc
-.env
+*.pyo
+*.pyd
+
+# Archivos de sistema (importante para que no se suban archivos basura de Windows/OneDrive)
+.DS_Store
+Thumbs.db
+Desktop.ini
