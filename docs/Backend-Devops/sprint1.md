@@ -62,3 +62,42 @@ Ver `docs/capturas/Backend-Devops/sprint1/` — capturas: clone en EC2, venv + d
 ![Endpoint /medicamentos respondiendo](../capturas/Backend-Devops/sprint1/dia2_medicamentos_endpoint.png)
 
 ![Documentación Swagger /docs](../capturas/Backend-Devops/sprint1/dia2_docs_swagger.png)
+
+---
+
+## Día 3 — 22 de junio 2025
+
+### Qué se hizo
+- Configurado `farmaluz.service` en systemd para que uvicorn corra como servicio persistente
+- Verificado que el servicio sobrevive el cierre y reapertura de SSH (`active (running)`)
+- Agregado `MONGO_URI` al `.env` del EC2 con las credenciales de MongoDB Atlas (coordinado con Sanchez)
+- Creado `.github/workflows/deploy.yml` con GitHub Actions CI/CD
+- Configurados secrets en GitHub: `EC2_HOST` y `EC2_SSH_KEY`
+- Workflow disparado automáticamente al hacer push a `main` → conecta por SSH al EC2, hace `git pull origin main` y reinicia el servicio
+- Merge completado: `feature/sprint0` → `develop` → `main`
+- Confirmado con Sanchez que `MONGO_URI` está activo y routers de `medicamentos` y `precios` integrados en `main.py`
+- FLZ-30, FLZ-31 y FLZ-32 marcados como Done en Huly
+
+### Decisión técnica
+El trigger del CI/CD se configuró en `main` (no en `feature/sprint0`) siguiendo la práctica GitFlow estándar: solo el código aprobado y mergeado a `main` se despliega al servidor. Las ramas `feature/*` y `develop` no disparan ningún deploy.
+
+### Evidencia — Día 3
+
+![Servicio systemd activo y persistente](../capturas/Backend-Devops/sprint1/dia3_systemd_activo.png)
+
+![Secrets configurados en GitHub](../capturas/Backend-Devops/sprint1/dia3_github_secrets.png)
+
+![Archivo deploy.yml en rama main](../capturas/Backend-Devops/sprint1/dia3_deploy_yml.png)
+
+![GitHub Actions ejecutado exitosamente](../capturas/Backend-Devops/sprint1/dia3_actions_verde.png)
+
+![Network graph — merges a develop y main](../capturas/Backend-Devops/sprint1/dia3_merge_network.png)
+
+![Huly — FLZ-31 y FLZ-32 marcados Done](../capturas/Backend-Devops/sprint1/dia3_huly_done.png)
+
+### Entregables completados
+- ✅ Uvicorn corriendo como servicio systemd persistente
+- ✅ MONGO_URI configurado en `.env` del EC2
+- ✅ GitHub Actions CI/CD funcionando (trigger en `main`)
+- ✅ Merge `feature/sprint0` → `develop` → `main` completado
+- ✅ FLZ-30, FLZ-31, FLZ-32 cerrados en Huly
