@@ -6,8 +6,6 @@ router = APIRouter(
     tags=["Precios"]
 )
 
-precios_mock = []
-
 
 @router.get("/{medicamento_id}")
 def obtener_precio(medicamento_id: str):
@@ -19,12 +17,13 @@ def obtener_precio(medicamento_id: str):
     }
 
 
+
 @router.post("/")
 def registrar_precio(precio: dict):
 
-    precios_mock.append(precio)
+    resultado = db.precios.insert_one(precio)
 
     return {
         "mensaje": "Precio registrado",
-        "data": precio
+        "id": str(resultado.inserted_id)
     }
