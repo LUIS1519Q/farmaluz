@@ -30,8 +30,7 @@ Resultado: `ROJO — 19.4% de sobreprecio` ✅
 
 ## Evidencia
 
-![Endpoint comparacion local](../../capturas/Backend/sprint2/dia1_endpoint_comparacion_local.png)
-
+![Endpoint comparacion local](../capturas/Backend-Devops/sprint2/dia1_endpoint_comparacion_local.png)
 ## ¿Qué falta?
 
 - Coordinar con Sanchez el formato exacto de los precios del scraper para integrarlo en el Día 2
