@@ -4,8 +4,8 @@ import os
 
 load_dotenv()
 
-MONGODB_URI = os.getenv("MONGODB_URI")
+MONGODB_URL = os.getenv("MONGODB_URL")
 
-client = MongoClient(MONGODB_URI)
+client = MongoClient(MONGODB_URL)
 
 db = client["farmaluz"]
