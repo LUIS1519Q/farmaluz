@@ -77,3 +77,42 @@ Caso límite: ID inexistente → `404 Precio no disponible para este medicamento
 - Recibir los datos reales de Sanchez (entrega Días 2 y 3 juntos mañana)
 - Borrar el documento simulado de `precios` en Atlas
 - Validar el flujo completo con precios reales del scraper
+
+# Sprint 2 — Día 3 | Paspuezán Luis | Backend + DevOps
+
+**Fecha:** Jueves 25 de junio de 2026  
+**Rama:** `feature/sprint2`
+
+## ¿Qué hice hoy?
+
+- Creé el endpoint `POST /auditoria` en `backend/routers/auditoria.py` que registra cada consulta de comparación realizada con todos sus datos: medicamento, precios, resultado del semáforo y fecha
+- Registré el router de auditoría en `backend/main.py`
+- Verifiqué que el documento se guardó correctamente en la colección `auditoria` de MongoDB Atlas
+- Verifiqué que Males aún no tiene los tests Pytest del semáforo — pendiente `tests/test_semaforo.py`
+- Verifiqué que Chicaiza aún no conectó el frontend al endpoint `/comparacion/{id}` — pendiente coordinación
+
+## Decisiones técnicas
+
+- El endpoint `POST /auditoria` recibe los datos de la consulta desde el frontend — es Chicaiza quien debe llamarlo después de mostrar el semáforo al usuario
+- Se usó `datetime.utcnow()` para registrar la fecha de consulta en UTC
+
+## Prueba realizada
+
+Registro de auditoría para **ABEMACICLIB**:
+- Precio techo: `$41.88`
+- Precio cobrado: `$45.00`
+- Estado: `ROJO — 7.4%`
+- Fecha: `2026-06-26T05:30:26` ✅
+
+## Evidencia
+
+![Endpoint auditoria 200](../capturas/Backend-Devops/sprint2/dia3_endpoint_auditoria.png)
+
+![Documento auditoria en MongoDB](../capturas/Backend-Devops/sprint2/dia3_auditoria_mongodb.png)
+
+## ¿Qué falta?
+
+- Sanchez: subir datos reales con `medicamento_id` en colección `precios` y borrar documento simulado
+- Chicaiza: conectar frontend al endpoint `GET /comparacion/{id}` y llamar a `POST /auditoria`
+- Males: escribir tests Pytest para `calcular_semaforo()` en `tests/test_semaforo.py`
+- Validar flujo completo con datos reales antes de merge a `main`
