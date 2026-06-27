@@ -1,7 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import medicamentos, precios, chatbot, comparacion, auditoria
 
 app = FastAPI(title="API FarmaLuz")
+
+# Configuración de CORS para permitir la conexión con el Frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite que cualquier puerto (como el 3000) se conecte
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],
+)
 
 app.include_router(precios.router)
 app.include_router(medicamentos.router)
