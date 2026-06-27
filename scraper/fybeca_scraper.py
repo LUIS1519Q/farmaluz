@@ -1,48 +1,71 @@
 from playwright.sync_api import sync_playwright
-
 import requests
+
+from datetime import datetime, UTC
+from backend.services.medicamentos_service import obtener_medicamentos
+
 
 def obtener_precio_fybeca(nombre_medicamento):
 
     with sync_playwright() as p:
 
-        browser = p.chromium.launch(
-            headless=True
-        )
+        browser = p.chromium.launch(headless=True)
 
         page = browser.new_page()
 
-        url_busqueda = (
+        page.goto(
             f"https://www.fybeca.com/busqueda?q={nombre_medicamento}"
         )
 
-        page.goto(url_busqueda)
-
         page.wait_for_timeout(5000)
 
-        producto = page.locator(
-            ".product.product-wrapper"
-        ).first
+        productos = page.locator(".product.product-wrapper")
 
-        if producto.count() == 0:
+        if productos.count() == 0:
             browser.close()
             return None
 
-        precio = producto.locator(
-            ".price .large-price .value"
-        ).get_attribute("content")
+        print(f"\nBuscando: {nombre_medicamento}")
+        print(f"Productos encontrados: {productos.count()}")
 
-        enlace = producto.locator(
-            ".pdp-link a.link"
-        ).get_attribute("href")
+        for i in range(productos.count()):
+
+            producto = productos.nth(i)
+
+            nombre_producto = producto.locator(
+                ".pdp-link a.link"
+            ).inner_text().strip()
+
+            print(f"Producto {i+1}: {nombre_producto}")
+
+            if nombre_medicamento.upper() not in nombre_producto.upper():
+                continue
+
+            print("Coincidencia encontrada")
+
+            precio = producto.locator(
+                ".price .large-price .value"
+            ).get_attribute("content")
+
+            enlace = producto.locator(
+                ".pdp-link a.link"
+            ).get_attribute("href")
+
+            browser.close()
+
+            return {
+                "medicamento_id": None,
+                "farmacia": "Fybeca",
+                "nombre_producto": nombre_producto,
+                "precio": float(precio),
+                "url": f"https://www.fybeca.com{enlace}"
+            }
 
         browser.close()
 
-        return {
-            "farmacia": "Fybeca",
-            "precio": float(precio),
-            "url": f"https://www.fybeca.com{enlace}"
-        }
+        return None
+
+
 def guardar_precio(resultado):
 
     response = requests.post(
@@ -52,29 +75,39 @@ def guardar_precio(resultado):
 
     return response.json()
 
-if __name__ == "__main__":
 
-    medicamentos = [
-        "paracetamol",
-        "ibuprofeno",
-        "amoxicilina",
-        "loratadina",
-        "omeprazol"
-    ]
+def ejecutar_fybeca():
+
+    medicamentos = obtener_medicamentos(limite=5)
 
     for medicamento in medicamentos:
 
-        resultado = obtener_precio_fybeca(
-            medicamento
+        nombre = medicamento["Principio Activo"]
+
+        print("=" * 70)
+        print("ID:", medicamento["_id"])
+        print("Medicamento:", nombre)
+
+        resultado = obtener_precio_fybeca(nombre)
+
+        print("Resultado:", resultado)
+
+        if resultado is None:
+            print("No se guardó en MongoDB")
+            continue
+
+        resultado["medicamento_id"] = str(
+            medicamento["_id"]
         )
 
-        print("SCRAPER:")
+        resultado["ultima_actualizacion"] = datetime.now(UTC).isoformat()
+
         print(resultado)
 
-        respuesta = guardar_precio(
-            resultado
-        )
+        respuesta = guardar_precio(resultado)
 
-        print("API:")
-        print(respuesta)
-        print("-" * 50)
+        print("API:", respuesta)
+
+
+if __name__ == "__main__":
+    ejecutar_fybeca()
