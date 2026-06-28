@@ -13,7 +13,7 @@ def obtener_respuesta_gemini(pregunta_usuario: str):
     prompt = obtener_prompt_completo(pregunta_usuario)
     try:
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-3.5-flash',
             contents=prompt
         )
         return response.text
