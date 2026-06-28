@@ -19,7 +19,7 @@ def obtener_respuesta_gemini(pregunta_usuario: str):
     try:
         # Usamos la nueva sintaxis y el modelo recomendado
         response = client.models.generate_content(
-            model='models/gemini-3.5-flash',
+            model='gemini-3.5-flash',
             contents=prompt
         )
         return response.text
