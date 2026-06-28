@@ -34,7 +34,7 @@ export default function Resultados() {
       try {
         setLoading(true);
         // Llamada a la API real
-        const response = await api.get('/medicamentos');
+        const response = await api.get('/medicamentos/');
         const dataReal = response.data;
         
         // Filtramos los resultados según la búsqueda
@@ -83,7 +83,7 @@ export default function Resultados() {
           <p className="text-center text-[#1A1A1A]/70 mt-10">No se encontraron medicamentos para esta búsqueda.</p>
         ) : (
           <div className="flex flex-col space-y-4">
-            {medicamentos.map((med: any) => {
+            {medicamentos.map((med: any, index: number) => {
               // 1. Normalización de textos
               const idSeguro = med.id || med._id || Math.random().toString();
               const nombre = med.nombre_comercial || med.nombre || med["Principio Activo"] || "Medicamento sin nombre";
@@ -108,7 +108,7 @@ export default function Resultados() {
               const porcentaje = med.porcentaje_sobreprecio || med.porcentaje || med.semaforo?.porcentaje || 0;
 
               return (
-                <Link href={`/medicamento/${idSeguro}`} key={idSeguro}>
+                <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`}>
                   <div className="bg-white rounded-lg p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-azulClaro/20 transition-colors cursor-pointer border border-transparent hover:border-azulClaro">
                     
                     <div className="mb-4 sm:mb-0">

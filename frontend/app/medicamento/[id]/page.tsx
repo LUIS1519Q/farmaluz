@@ -38,7 +38,7 @@ export default function DetalleMedicamento() {
         setLoading(true);
         setError(false);
 
-        // 1. Petición de precios (Si da 404, manejamos la vista amigable sin romper Next.js)
+        // 1. Petición de precios (¡Ojo al slash al final!)
         let compData = null;
         try {
           const compResponse = await api.get(`/comparacion/${id}`);
@@ -51,24 +51,55 @@ export default function DetalleMedicamento() {
             setMensajeError("No pudimos conectar con el servidor.");
           }
           setLoading(false);
-          return; // Detiene la ejecución para que no intente buscar el nombre de algo que no existe
+          return; 
         }
 
-        // 2. Petición de información básica (Nombres y Principio Activo)
-        let infoData = {};
+        // 2. Petición de información básica (¡Ojo al slash al final!)
+        let infoData: any = {};
         try {
           const infoResponse = await api.get(`/medicamentos/${id}`);
           infoData = infoResponse.data.data || infoResponse.data.medicamento || infoResponse.data;
-          if (Array.isArray(infoData)) infoData = infoData[0]; // Por si el backend responde una lista
+          if (Array.isArray(infoData)) infoData = infoData[0]; 
         } catch (err) {
           console.warn("No se pudo cargar el nombre del medicamento desde la API");
         }
 
-        // 3. Fusionamos la información en el estado
-        setMed({
+        // Función interna para asegurar que enviamos números válidos
+        const normalizarPrecio = (precioRaw: any) => {
+          if (!precioRaw) return 0.0;
+          if (typeof precioRaw === 'number') return precioRaw;
+          const numeroLimpio = Number(precioRaw.toString().replace(/[^0-9.-]+/g, ""));
+          return isNaN(numeroLimpio) ? 0.0 : numeroLimpio;
+        };
+
+        // 3. Fusionamos la información en el estado de la interfaz
+        const datosUnificados = {
           ...infoData,
           ...compData
-        });
+        };
+        setMed(datosUnificados);
+
+
+        // ENVÍO DE AUDITORÍA (¡Ojo al slash al final!)
+        try {
+          const payloadAuditoria = {
+            medicamento_id: String(id),
+            nombre: String(infoData.nombre_comercial || infoData.nombre || infoData["Principio Activo"] || "Medicamento Sin Nombre"),
+            precio_techo: normalizarPrecio(compData.precio_techo || compData["Precio Techo"]),
+            precio_cobrado: normalizarPrecio(compData.precio_cobrado || compData["Precio Cobrado"]),
+            estado_semaforo: String(compData.semaforo?.estado || compData.estado || "VERDE"),
+            porcentaje: normalizarPrecio(compData.semaforo?.porcentaje || compData.porcentaje),
+            farmacia: String(compData.farmacia || infoData.farmacia || "Fybeca") 
+          };
+
+          // Enviamos el POST al endpoint de auditoría de forma asíncrona
+          api.post('/auditoria/', payloadAuditoria)
+            .then(res => console.log("Auditoría registrada:", res.data.mensaje))
+            .catch(err => console.warn("Error al registrar auditoría en el servidor:", err));
+
+        } catch (auditErr) {
+          console.warn("Error al estructurar el payload de auditoría:", auditErr);
+        }
 
       } catch (err) {
         console.error("Error crítico en el flujo:", err);
@@ -171,7 +202,28 @@ export default function DetalleMedicamento() {
               <SemaforoCard estado={estadoSemaforo as "VERDE" | "ROJO"} porcentaje={porcentaje} />
             </div>
           </div>
-
+          {/* NUEVO BOTÓN DE NAVEGACIÓN A GENÉRICOS */}
+          <div className="mt-10 pt-8 border-t border-gray-200 flex justify-center">
+            <Link href={`/genericos/${id}`}>
+              <button className="bg-verdeSemaforo text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
+                Buscar alternativas genéricas
+              </button>
+            </Link>
+          </div>
+          {/* BOTONES DE NAVEGACIÓN (Genéricos y Chatbot) */}
+          <div className="mt-10 pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-center gap-4">
+            <Link href={`/genericos/${id}`}>
+              <button className="bg-verdeSemaforo text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
+                Buscar Genéricos
+              </button>
+            </Link>
+            
+            <Link href="/chatbot">
+              <button className="bg-azulMedio text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-azulOscuro hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
+                Consultar Asistente IA
+              </button>
+            </Link>
+          </div>
         </div>
       </main>
     </div>
