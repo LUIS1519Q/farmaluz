@@ -14,8 +14,7 @@ def obtener_respuesta_gemini(pregunta_usuario: str):
     try:
         response = client.models.generate_content(
             model='gemini-2.0-flash',
-            contents=prompt,
-            config={"timeout": 10}
+            contents=prompt
         )
         return response.text
     except Exception as e:
