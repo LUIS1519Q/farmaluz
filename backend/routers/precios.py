@@ -17,13 +17,20 @@ def obtener_precio(medicamento_id: str):
     }
 
 
-
 @router.post("/")
 def registrar_precio(precio: dict):
 
-    resultado = db.precios.insert_one(precio)
+    db.precios.update_one(
+        {
+            "medicamento_id": precio["medicamento_id"],
+            "farmacia": precio["farmacia"]
+        },
+        {
+            "$set": precio
+        },
+        upsert=True
+    )
 
     return {
-        "mensaje": "Precio registrado",
-        "id": str(resultado.inserted_id)
+        "mensaje": "Precio registrado"
     }
