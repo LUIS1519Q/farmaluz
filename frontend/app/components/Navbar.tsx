@@ -3,6 +3,7 @@ import { Pill } from 'lucide-react'; // Usamos Lucide para simular el concepto d
 
 export default function Navbar() {
   return (
+    
     <nav className="bg-azulOscuro text-white w-full h-16 px-6 flex items-center justify-between shadow-md">
       {/* Contenedor del Logo (Cruz médica / Pastilla con luz) */}
       <div className="flex items-center space-x-2">
