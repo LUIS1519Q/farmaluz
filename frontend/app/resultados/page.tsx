@@ -34,7 +34,7 @@ export default function Resultados() {
       try {
         setLoading(true);
         // Llamada a la API real
-        const response = await api.get('/medicamentos/');
+        const response = await api.get('http://127.0.0.1:8000/medicamentos/');
         const dataReal = response.data;
         
         // Filtramos los resultados según la búsqueda
