@@ -22,3 +22,9 @@ app.include_router(auditoria.router)
 @app.get("/")
 def read_root():
     return {"status": "OK", "message": "Bienvenido a la API de FarmaLuz"}
+
+@app.on_event("startup")
+def startup_event():
+    for route in app.routes:
+        if hasattr(route, "path"):
+            print(f"Ruta registrada: {route.path}")
