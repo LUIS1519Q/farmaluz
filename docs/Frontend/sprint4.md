@@ -57,3 +57,8 @@ Evidencia — Día 1
 
 Evidencia — Día 2
 ![Manual usuario](../capturas/frontend/sprint4/dia2_manual_usuario.png)
+
+Manuales de Usuario
+
+[Manual de Usuario (PDF)](../capturas/Frontend/docs/MANUAL_DE_USUARIO_farmaluz.pdf)
+[Manual de Usuario (Word)](../capturas/Frontend/docs/MANUAL_DE_USUARIO_farmaluz.docx)
