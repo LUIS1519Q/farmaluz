@@ -7,10 +7,7 @@ import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
 import SemaforoCard from '../components/SemaforoCard';
 import { api } from '../../lib/api';
-// Mantenemos el mock importado temporalmente para el fallback del semáforo si es necesario
-import mockMedicamentos from '../../data/mockMedicamentos.json';
 
-// Definimos la interfaz basada en lo que devuelve el backend
 interface Medicamento {
   id: string;
   nombre_comercial: string;
@@ -25,7 +22,7 @@ interface Medicamento {
 export default function Resultados() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q')?.toLowerCase() || '';
-  
+
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,27 +30,41 @@ export default function Resultados() {
     const fetchMedicamentos = async () => {
       try {
         setLoading(true);
-        // Llamada a la API real
-        const response = await api.get('http://127.0.0.1:8000/medicamentos/');
+        const response = await api.get('/medicamentos/');
         const dataReal = response.data;
-        
-        // Filtramos los resultados según la búsqueda
+
         const filtrados = dataReal.filter((med: any) => {
-          const nombreSeguro = (med.nombre_comercial || med.nombre || med["Principio Activo"] || "").toLowerCase();
-          const principioSeguro = (med.principio_activo || "").toLowerCase();
-          
-          return nombreSeguro.includes(query) || principioSeguro.includes(query);
+          const nombreSeguro = (med["Principio Activo"] || "").toLowerCase();
+          return nombreSeguro.includes(query);
         });
-        
-        setMedicamentos(filtrados);
+
+        const conPrecios = await Promise.all(
+          filtrados.slice(0, 20).map(async (med: any) => {
+            try {
+              const comp = await api.get(`/comparacion/${med._id}`);
+              return {
+                ...med,
+                precio_techo: comp.data.precio_techo,
+                precio_cobrado: comp.data.precio_cobrado,
+                estado_semaforo: comp.data.semaforo?.estado || "VERDE",
+                porcentaje_sobreprecio: comp.data.semaforo?.porcentaje || 0,
+              };
+            } catch {
+              return {
+                ...med,
+                precio_techo: 0,
+                precio_cobrado: 0,
+                estado_semaforo: "VERDE",
+                porcentaje_sobreprecio: 0,
+              };
+            }
+          })
+        );
+
+        setMedicamentos(conPrecios);
       } catch (error) {
         console.error("Error cargando medicamentos de la API:", error);
-        // Si la API falla, usamos el mock como contingencia para no romper la pantalla
-        const filtradosMock = mockMedicamentos.filter(med => 
-          med.nombre_comercial.toLowerCase().includes(query) || 
-          med.principio_activo.toLowerCase().includes(query)
-        );
-        setMedicamentos(filtradosMock as Medicamento[]);
+        setMedicamentos([]);
       } finally {
         setLoading(false);
       }
@@ -84,53 +95,40 @@ export default function Resultados() {
         ) : (
           <div className="flex flex-col space-y-4">
             {medicamentos.map((med: any, index: number) => {
-              // 1. Normalización de textos
-              const idSeguro = med.id || med._id || Math.random().toString();
-              const nombre = med.nombre_comercial || med.nombre || med["Principio Activo"] || "Medicamento sin nombre";
-              const principio = med.principio_activo || med["Principio Activo"] || "";
-              const concentracion = med.concentracion || med["Concentración"] || "";
+              const idSeguro = med._id || med.id || Math.random().toString();
+              const nombre = med["Principio Activo"] || med.nombre_comercial || "Medicamento sin nombre";
+              const principio = med["Principio Activo"] || "";
+              const concentracion = med["Concentración "] || med.concentracion || "";
 
-              // 2. Función robusta para limpiar precios (quita símbolos "$" y letras, dejando solo el número)
-              const limpiarPrecio = (precioRaw: any) => {
-                if (!precioRaw) return 0;
-                if (typeof precioRaw === 'number') return precioRaw;
-                // Extrae solo los números y el punto decimal
-                const numeroLimpio = Number(precioRaw.toString().replace(/[^0-9.-]+/g, ""));
-                return isNaN(numeroLimpio) ? 0 : numeroLimpio;
-              };
-
-              // 3. Extracción de precios y semáforo adaptados al backend
-              const precioTecho = limpiarPrecio(med.precio_techo || med["Precio Techo"]);
-              // Usamos 0 como fallback temporal si el scraper aún no ha guardado el precio_cobrado
-              const precioCobrado = limpiarPrecio(med.precio_cobrado || med["Precio Cobrado"] || 0); 
-              
-              const estadoSemaforo = med.estado_semaforo || med.estado || med.semaforo?.estado || "VERDE";
-              const porcentaje = med.porcentaje_sobreprecio || med.porcentaje || med.semaforo?.porcentaje || 0;
+              const precioTecho = med.precio_techo || 0;
+              const precioCobrado = med.precio_cobrado || 0;
+              const estadoSemaforo = med.estado_semaforo || "VERDE";
+              const porcentaje = med.porcentaje_sobreprecio || 0;
 
               return (
                 <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`}>
                   <div className="bg-white rounded-lg p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-azulClaro/20 transition-colors cursor-pointer border border-transparent hover:border-azulClaro">
-                    
+
                     <div className="mb-4 sm:mb-0">
                       <h3 className="text-[20px] font-bold text-[#1A1A1A]">{nombre}</h3>
                       <p className="text-[16px] text-[#1A1A1A]/70">{principio} {concentracion ? `• ${concentracion}` : ''}</p>
-                      
+
                       <div className="mt-3 text-[14px] flex flex-col space-y-1">
                         <p>
-                          <span className="font-medium text-[#1A1A1A]/60">Precio Techo Oficial:</span> 
+                          <span className="font-medium text-[#1A1A1A]/60">Precio Techo Oficial:</span>
                           <span className="ml-2 font-semibold">${precioTecho.toFixed(2)}</span>
                         </p>
                         <p>
-                          <span className="font-medium text-[#1A1A1A]/60">Precio Cobrado:</span> 
+                          <span className="font-medium text-[#1A1A1A]/60">Precio Cobrado:</span>
                           <span className="ml-2 font-semibold text-azulOscuro">${precioCobrado.toFixed(2)}</span>
                         </p>
                       </div>
                     </div>
 
                     <div className="flex-shrink-0">
-                      <SemaforoCard 
-                        estado={estadoSemaforo as "VERDE" | "ROJO"} 
-                        porcentaje={porcentaje} 
+                      <SemaforoCard
+                        estado={estadoSemaforo as "VERDE" | "ROJO"}
+                        porcentaje={porcentaje}
                       />
                     </div>
 
