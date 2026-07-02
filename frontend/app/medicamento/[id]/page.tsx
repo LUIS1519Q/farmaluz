@@ -38,7 +38,7 @@ export default function DetalleMedicamento() {
         setLoading(true);
         setError(false);
 
-        // 1. Petición de precios (¡Ojo al slash al final!)
+        // 1. Petición de precios
         let compData = null;
         try {
           const compResponse = await api.get(`/comparacion/${id}`);
@@ -54,7 +54,7 @@ export default function DetalleMedicamento() {
           return; 
         }
 
-        // 2. Petición de información básica (¡Ojo al slash al final!)
+        // 2. Petición de información básica 
         let infoData: any = {};
         try {
           const infoResponse = await api.get(`/medicamentos/${id}`);
