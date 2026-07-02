@@ -11,15 +11,17 @@ export default function SearchBar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      // Redirige a resultados pasando el texto como parámetro "q"
-      router.push(`/resultados?q=${query.toLowerCase()}`);
+      // Navegación SPA sin recargar la página (soluciona el problema en móviles)
+      router.push(`/resultados?q=${encodeURIComponent(query.trim().toLowerCase())}`);
     }
   };
 
   return (
-    <form onSubmit={handleSearch} className="relative w-full max-w-xl mx-auto">
+    <form action="/resultados" method="GET" onSubmit={handleSearch} className="relative w-full max-w-xl mx-auto">
       <input
-        type="text"
+        type="text" 
+        name="q"
+        inputMode="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Ingresa el nombre comercial o principio activo..."
@@ -28,7 +30,6 @@ export default function SearchBar() {
       <button 
         type="submit"
         className="absolute right-2 top-1/2 -translate-y-1/2 bg-azulMedio hover:bg-azulOscuro text-white p-2 rounded-md transition-colors flex items-center justify-center"
-        aria-label="Buscar"
       >
         <Search className="w-5 h-5" />
       </button>

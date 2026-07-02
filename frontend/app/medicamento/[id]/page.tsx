@@ -202,22 +202,8 @@ export default function DetalleMedicamento() {
               <SemaforoCard estado={estadoSemaforo as "VERDE" | "ROJO"} porcentaje={porcentaje} />
             </div>
           </div>
-          {/* NUEVO BOTÓN DE NAVEGACIÓN A GENÉRICOS */}
+          {/* BOTÓN DE NAVEGACIÓN (Chatbot) */}
           <div className="mt-10 pt-8 border-t border-gray-200 flex justify-center">
-            <Link href={`/genericos/${id}`}>
-              <button className="bg-verdeSemaforo text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
-                Buscar alternativas genéricas
-              </button>
-            </Link>
-          </div>
-          {/* BOTONES DE NAVEGACIÓN (Genéricos y Chatbot) */}
-          <div className="mt-10 pt-8 border-t border-gray-200 flex flex-col sm:flex-row justify-center gap-4">
-            <Link href={`/genericos/${id}`}>
-              <button className="bg-verdeSemaforo text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
-                Buscar Genéricos
-              </button>
-            </Link>
-            
             <Link href="/chatbot">
               <button className="bg-azulMedio text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-azulOscuro hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
                 Consultar Asistente IA
