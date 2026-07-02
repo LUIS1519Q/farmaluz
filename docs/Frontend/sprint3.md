@@ -36,11 +36,11 @@ Entregables completados
 ✅ Responsive verificado en el flujo completo   
 
 Evidencia — Día 1
-![Pantalla Genericos](../capturas/frontend/sprint2/dia1_implementando_axios.png)
-![Chat Bot](../capturas/frontend/sprint2/dia1_interfaz_chatbot.png)
-![Chat Bot](../capturas/frontend/sprint2/dia1_chatbot_escribiendo.png)
+![Pantalla Genericos](../capturas/frontend/sprint3/dia1_implementando_axios.png)
+![Chat Bot](../capturas/frontend/sprint3/dia1_interfaz_chatbot.png)
+![Chat Bot](../capturas/frontend/sprint3/dia1_chatbot_escribiendo.png)
 
 Evidencia — Día 2
-![Botones Navegacion](../capturas/frontend/sprint2/dia2_botones_navegacion.png)
-![Botones Navegacion](../capturas/frontend/sprint2/dia2_responsive_flujo.png)
+![Botones Navegacion](../capturas/frontend/sprint3/dia2_botones_navegacion.png)
+![Botones Navegacion](../capturas/frontend/sprint3/dia2_responsive_flujo.png)
 
