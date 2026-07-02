@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import { api } from '../../lib/api';
+import ReactMarkdown from 'react-markdown'; // ¡Nueva importación!
 
 interface Mensaje {
   id: number;
@@ -23,10 +24,10 @@ export default function Chatbot() {
   const [escribiendo, setEscribiendo] = useState(false);
   const mensajesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll hacia abajo cuando hay un mensaje nuevo
   const scrollToBottom = () => {
     mensajesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  
   useEffect(() => {
     scrollToBottom();
   }, [mensajes, escribiendo]);
@@ -36,16 +37,20 @@ export default function Chatbot() {
     if (!input.trim()) return;
 
     const textoUsuario = input;
-    setInput(''); // Limpiamos el input
+    setInput('');
     
-    // Agregamos el mensaje del usuario a la pantalla
     setMensajes(prev => [...prev, { id: Date.now(), texto: textoUsuario, emisor: 'usuario' }]);
     setEscribiendo(true);
 
     try {
-      // Petición al endpoint de Vela con el formato acordado { pregunta: string }
-      const response = await api.post('http://127.0.0.1:8000/chatbot/consulta', { pregunta: textoUsuario });
-      
+      const historialBackend = mensajes.map(msg => ({
+        rol: msg.emisor,
+        contenido: msg.texto
+      }));
+      const response = await api.post('http://127.0.0.1:8000/chatbot/consulta', { 
+        pregunta: textoUsuario, 
+        historial: historialBackend 
+      });
       const respuestaBot = response.data.respuesta || response.data.mensaje || "No recibí una respuesta válida del servidor.";
 
       setMensajes(prev => [...prev, { id: Date.now() + 1, texto: respuestaBot, emisor: 'bot' }]);
@@ -86,13 +91,30 @@ export default function Chatbot() {
         <div className="flex-1 bg-white p-4 overflow-y-auto flex flex-col space-y-4">
           {mensajes.map((msg) => (
             <div key={msg.id} className={`flex ${msg.emisor === 'usuario' ? 'justify-end' : 'justify-start'}`}>
+              
               <div className={`max-w-[80%] rounded-2xl px-5 py-3 ${
                 msg.emisor === 'usuario' 
                   ? 'bg-azulMedio text-white rounded-br-none' 
                   : 'bg-gray-100 text-[#1A1A1A] rounded-bl-none'
               }`}>
-                {msg.texto}
+                {/* MAGIA DE MARKDOWN: Renderizado dinámico según el emisor */}
+                {msg.emisor === 'usuario' ? (
+                  msg.texto
+                ) : (
+                  <ReactMarkdown
+                    components={{
+                      p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc ml-5 mb-3 space-y-1" {...props} />,
+                      li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                      strong: ({node, ...props}) => <strong className="font-semibold text-black" {...props} />,
+                      em: ({node, ...props}) => <em className="italic text-gray-600 text-sm block mt-4 border-t pt-2" {...props} />
+                    }}
+                  >
+                    {msg.texto}
+                  </ReactMarkdown>
+                )}
               </div>
+
             </div>
           ))}
           
