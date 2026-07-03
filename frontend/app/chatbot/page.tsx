@@ -44,7 +44,7 @@ export default function Chatbot() {
 
     try {
       // Petición al endpoint de Vela con el formato acordado { pregunta: string }
-      const response = await api.post('http://18.225.130.85/chatbot/consulta', { pregunta: textoUsuario });
+      const response = await api.post('/chatbot/consulta', { pregunta: textoUsuario });
       
       const respuestaBot = response.data.respuesta || response.data.mensaje || "No recibí una respuesta válida del servidor.";
 
