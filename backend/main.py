@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import medicamentos, precios, chatbot, comparacion, auditoria
+from backend.routers import medicamentos, precios, chatbot, comparacion, auditoria, dashboard
 
 app = FastAPI(title="API FarmaLuz")
 
@@ -18,6 +18,7 @@ app.include_router(medicamentos.router)
 app.include_router(chatbot.router)
 app.include_router(comparacion.router)
 app.include_router(auditoria.router)
+app.include_router(dashboard.router)
 
 @app.get("/")
 def read_root():
