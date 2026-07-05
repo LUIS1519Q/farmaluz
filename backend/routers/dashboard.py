@@ -12,11 +12,19 @@ def obtener_stats():
     total_consultas = db.auditoria.count_documents({})
     total_fybeca = db.precios.count_documents({"farmacia": "Fybeca"})
     total_cruzazul = db.precios.count_documents({"farmacia": "Cruz Azul"})
-    total_con_sobreprecio = db.precios.count_documents({"semaforo": "ROJO"})
     total_precios = db.precios.count_documents({})
+
+    precios = list(db.precios.find({}, {"precio": 1, "precio_techo": 1}))
+    total_con_sobreprecio = sum(
+        1 for p in precios
+        if p.get("precio") and p.get("precio_techo")
+        and p["precio"] > p["precio_techo"]
+    )
+
     porcentaje_sobreprecio = 0
     if total_precios > 0:
         porcentaje_sobreprecio = round((total_con_sobreprecio / total_precios) * 100, 1)
+
     return {
         "total_medicamentos": total_medicamentos,
         "total_consultas": total_consultas,
@@ -40,7 +48,7 @@ def top_medicamentos():
 def ultimas_consultas():
     consultas = list(
         db.auditoria.find({}, {"_id": 0})
-        .sort("fecha", -1)
+        .sort("fecha_consulta", -1)
         .limit(5)
     )
     return consultas
