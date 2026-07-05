@@ -8,6 +8,7 @@ def get_ai_response(user_input, system_prompt, historial=[]):
     try:
         chat = ChatGroq(
             api_key=os.getenv("GROQ_API_KEY"),
+            temperature=0.1,
             model_name="llama-3.1-8b-instant"
         )
         

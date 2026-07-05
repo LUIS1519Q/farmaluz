@@ -1,0 +1,1 @@
+from .medicamento import Medicamento

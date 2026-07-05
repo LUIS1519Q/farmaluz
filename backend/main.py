@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import medicamentos, precios, chatbot, comparacion, auditoria
+from routers import medicamentos, precios, chatbot, comparacion, auditoria
 
 app = FastAPI(title="API FarmaLuz")
 

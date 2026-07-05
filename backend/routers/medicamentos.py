@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 
-from backend.database import db
-from backend.models import MedicamentoGenerico 
+from database import db
+from models import Medicamento
 
 router = APIRouter(
     prefix="/medicamentos",
@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/genericos/{id}", response_model=MedicamentoGenerico)
+@router.get("/genericos/{id}", response_model=Medicamento)
 def obtener_generico(id: int): 
     generico = db.genericos.find_one({"id": id})
     
@@ -21,7 +21,7 @@ def obtener_generico(id: int):
     return generico
 
 @router.post("/genericos/")
-def crear_generico(medicamento: MedicamentoGenerico):
+def crear_generico(medicamento: Medicamento):
     # Guardamos específicamente en la colección 'genericos'
     resultado = db.genericos.insert_one(medicamento.model_dump()) 
     return {
