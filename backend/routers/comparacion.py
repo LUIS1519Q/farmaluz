@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
-from backend.services.semaforo_service import calcular_semaforo
-from backend.database import db
+from services.semaforo_service import calcular_semaforo
+from database import db
 from pymongo import ASCENDING
 
 router = APIRouter(tags=["Comparacion"])

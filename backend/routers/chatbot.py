@@ -1,7 +1,7 @@
 from typing import Optional, List
 from fastapi import APIRouter
 from pydantic import BaseModel
-from backend.chatbot.ai_service import get_ai_response
+from chatbot.ai_service import get_ai_response
 
 class MensajeHistorial(BaseModel):  
     rol: str  # "user" o "assistant"

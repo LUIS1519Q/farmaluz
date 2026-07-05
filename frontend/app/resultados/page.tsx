@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -19,7 +20,7 @@ interface Medicamento {
   porcentaje_sobreprecio: number;
 }
 
-export default function Resultados() {
+function ResultadosContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q')?.toLowerCase() || '';
 
@@ -140,5 +141,17 @@ export default function Resultados() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function Resultados() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F2F2F2] flex items-center justify-center">
+        <p className="text-azulMedio font-medium">Cargando...</p>
+      </div>
+    }>
+      <ResultadosContent />
+    </Suspense>
   );
 }
