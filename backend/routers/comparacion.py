@@ -63,13 +63,15 @@ def comparar_precio(medicamento_id: str):
 
     #  Retornar todo en la respuesta final
     return {
-        "medicamento_id": medicamento_id,
-        "nombre": medicamento.get("Principio Activo", "Sin nombre"),
-        "concentracion": medicamento.get("Concentración", ""),
-        "farmacia": precio_doc.get("farmacia", ""),
-        "precio_techo": precio_techo,
-        "precio_cobrado": precio_cobrado,
-        "semaforo": resultado,
-        "ahorro_estimado": round(ahorro_estimado, 2), # Redondeado a 2 decimales
-        "alternativas_genericas": lista_genericos
-    }
+    "medicamento_id": medicamento_id,
+    "nombre": medicamento.get("Principio Activo", "Sin nombre"),
+    "concentracion": medicamento.get("Concentración", ""),
+    "farmacia": precio_doc.get("farmacia", ""),
+    "precio_techo": precio_techo,
+    "precio_cobrado": precio_cobrado,
+    "semaforo": resultado,
+    "ahorro_estimado": round(ahorro_estimado, 2),
+    "alternativas_genericas": lista_genericos,
+    "url_producto": precio_doc.get("url", "#"),
+    "ultima_actualizacion": precio_doc.get("ultima_actualizacion", "Fecha no disponible")
+}
