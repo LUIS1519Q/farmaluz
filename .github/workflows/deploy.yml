@@ -17,5 +17,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/apps/farmaluz
-            git pull origin main
-            sudo systemctl restart farmaluz
+            git pull origin main --no-rebase
+            sudo systemctl restart farmaluz.service
+            cd frontend
+            npm install --legacy-peer-deps
+            npm run build
+            sudo systemctl restart farmaluz-frontend.service
