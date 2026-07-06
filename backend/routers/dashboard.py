@@ -28,10 +28,10 @@ def obtener_stats():
     return {
         "total_medicamentos": total_medicamentos,
         "total_consultas": total_consultas,
-        "farmacias_activas": 2,
+        "total_farmacias": 2,
         "porcentaje_sobreprecio": porcentaje_sobreprecio,
-        "total_fybeca": total_fybeca,
-        "total_cruzazul": total_cruzazul
+        "precios_fybeca": total_fybeca,
+        "precios_cruz_azul": total_cruzazul
     }
 
 @router.get("/top-medicamentos")
@@ -42,7 +42,7 @@ def top_medicamentos():
         {"$limit": 5}
     ]
     resultados = list(db.auditoria.aggregate(pipeline))
-    return [{"nombre": r["_id"], "consultas": r["total"]} for r in resultados]
+    return [{"nombre": r["_id"], "cantidad": r["total"]} for r in resultados]
 
 @router.get("/ultimas-consultas")
 def ultimas_consultas():
