@@ -27,6 +27,9 @@ function ResultadosContent() {
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Generamos el alfabeto para el filtro
+  const letras = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+
   useEffect(() => {
     const fetchMedicamentos = async () => {
       try {
@@ -75,70 +78,88 @@ function ResultadosContent() {
   }, [query]);
 
   return (
-    <div className="min-h-screen bg-[#F2F2F2] text-[#1A1A1A] flex flex-col">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
-        <div className="mb-8">
-          <SearchBar />
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 md:px-8 py-10 flex flex-col">
+        {/* Barra de búsqueda superior y Título */}
+        <div className="w-full max-w-4xl mx-auto mb-10 text-center">
+          <div className="mb-8">
+            <SearchBar />
+          </div>
+          <h1 className="text-[40px] font-extrabold text-azulOscuro tracking-tight">
+            Resultados para {query ? `"${query}"` : 'todos'}
+          </h1>
         </div>
 
-        <h2 className="text-[24px] font-semibold text-azulOscuro mb-6">
-          {query ? `Resultados para "${query}"` : 'Todos los resultados'}
-        </h2>
+        {/* Layout de dos columnas: Filtro y Grilla */}
+        <div className="flex flex-col md:flex-row gap-10">
+          
+          {/* Sidebar: Filtro Alfabético */}
+          <aside className="w-full md:w-48 flex-shrink-0">
+            <div className="sticky top-24">
+              <h3 className="font-semibold text-gray-700 mb-4 leading-tight">
+                Filtrar por letra<br/>(A-Z)
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {letras.map((letra) => (
+                  <button
+                    key={letra}
+                    className="w-10 h-10 rounded-lg bg-blue-100 text-azulOscuro font-bold hover:bg-azulMedio hover:text-white transition-colors flex items-center justify-center text-sm"
+                  >
+                    {letra}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
 
-        {loading ? (
-          <div className="text-center text-azulMedio mt-10 font-medium">
-            Cargando resultados desde el servidor...
-          </div>
-        ) : medicamentos.length === 0 ? (
-          <p className="text-center text-[#1A1A1A]/70 mt-10">No se encontraron medicamentos para esta búsqueda.</p>
-        ) : (
-          <div className="flex flex-col space-y-4">
-            {medicamentos.map((med: any, index: number) => {
-              const idSeguro = med._id || med.id || Math.random().toString();
-              const nombre = med["Principio Activo"] || med.nombre_comercial || "Medicamento sin nombre";
-              const principio = med["Principio Activo"] || "";
-              const concentracion = med["Concentración "] || med.concentracion || "";
+          {/* Grilla de Resultados */}
+          <div className="flex-1">
+            {loading ? (
+              <div className="text-center text-azulMedio mt-10 font-medium">
+                Cargando resultados desde el servidor...
+              </div>
+            ) : medicamentos.length === 0 ? (
+              <p className="text-center text-[#1A1A1A]/70 mt-10">No se encontraron medicamentos para esta búsqueda.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {medicamentos.map((med: any, index: number) => {
+                  const idSeguro = med._id || med.id || Math.random().toString();
+                  const nombre = med["Principio Activo"] || med.nombre_comercial || "Medicamento sin nombre";
+                  const principio = med["Principio Activo"] || "";
+                  const concentracion = med["Concentración "] || med.concentracion || "";
+                  const estadoSemaforo = med.estado_semaforo || "VERDE";
+                  const porcentaje = med.porcentaje_sobreprecio || 0;
 
-              const precioTecho = med.precio_techo || 0;
-              const precioCobrado = med.precio_cobrado || 0;
-              const estadoSemaforo = med.estado_semaforo || "VERDE";
-              const porcentaje = med.porcentaje_sobreprecio || 0;
+                  return (
+                    <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`} className="block h-full">
+                      <div className="bg-white rounded-[16px] p-5 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full flex flex-col justify-between hover:-translate-y-1">
+                        
+                        <div className="mb-4">
+                          <h3 className="text-[17px] font-bold text-[#1A1A1A] leading-tight mb-2 uppercase">
+                            {nombre} {concentracion}
+                          </h3>
+                          <p className="text-[13px] text-gray-500">
+                            Principio activo: <span className="capitalize">{principio.toLowerCase()}</span>
+                          </p>
+                        </div>
 
-              return (
-                <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`}>
-                  <div className="bg-white rounded-lg p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-azulClaro/20 transition-colors cursor-pointer border border-transparent hover:border-azulClaro">
+                        <div className="mt-auto">
+                          <SemaforoCard
+                            estado={estadoSemaforo as "VERDE" | "ROJO"}
+                            porcentaje={porcentaje}
+                          />
+                        </div>
 
-                    <div className="mb-4 sm:mb-0">
-                      <h3 className="text-[20px] font-bold text-[#1A1A1A]">{nombre}</h3>
-                      <p className="text-[16px] text-[#1A1A1A]/70">{principio} {concentracion ? `• ${concentracion}` : ''}</p>
-
-                      <div className="mt-3 text-[14px] flex flex-col space-y-1">
-                        <p>
-                          <span className="font-medium text-[#1A1A1A]/60">Precio Techo Oficial:</span>
-                          <span className="ml-2 font-semibold">${precioTecho.toFixed(2)}</span>
-                        </p>
-                        <p>
-                          <span className="font-medium text-[#1A1A1A]/60">Precio Cobrado:</span>
-                          <span className="ml-2 font-semibold text-azulOscuro">${precioCobrado.toFixed(2)}</span>
-                        </p>
                       </div>
-                    </div>
-
-                    <div className="flex-shrink-0">
-                      <SemaforoCard
-                        estado={estadoSemaforo as "VERDE" | "ROJO"}
-                        porcentaje={porcentaje}
-                      />
-                    </div>
-
-                  </div>
-                </Link>
-              );
-            })}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
     </div>
   );
@@ -147,7 +168,7 @@ function ResultadosContent() {
 export default function Resultados() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#F2F2F2] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <p className="text-azulMedio font-medium">Cargando...</p>
       </div>
     }>

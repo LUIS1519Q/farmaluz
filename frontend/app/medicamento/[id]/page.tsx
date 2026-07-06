@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import SemaforoCard from '../../components/SemaforoCard';
 import { api } from '../../../lib/api';
+import Image from 'next/image';
+import { Calendar } from 'lucide-react';
 
 interface DetalleMedicamento {
   id?: string;
@@ -20,7 +22,7 @@ interface DetalleMedicamento {
     porcentaje: number;
   };
   ultima_actualizacion?: string;
-  [key: string]: any; // Permite leer llaves dinámicas del backend si cambian
+  [key: string]: any;
 }
 
 export default function DetalleMedicamento() {
@@ -38,7 +40,6 @@ export default function DetalleMedicamento() {
         setLoading(true);
         setError(false);
 
-        // 1. Petición de precios
         let compData = null;
         try {
           const compResponse = await api.get(`/comparacion/${id}`);
@@ -54,7 +55,6 @@ export default function DetalleMedicamento() {
           return; 
         }
 
-        // 2. Petición de información básica 
         let infoData: any = {};
         try {
           const infoResponse = await api.get(`/medicamentos/${id}`);
@@ -64,7 +64,6 @@ export default function DetalleMedicamento() {
           console.warn("No se pudo cargar el nombre del medicamento desde la API");
         }
 
-        // Función interna para asegurar que enviamos números válidos
         const normalizarPrecio = (precioRaw: any) => {
           if (!precioRaw) return 0.0;
           if (typeof precioRaw === 'number') return precioRaw;
@@ -72,15 +71,12 @@ export default function DetalleMedicamento() {
           return isNaN(numeroLimpio) ? 0.0 : numeroLimpio;
         };
 
-        // 3. Fusionamos la información en el estado de la interfaz
         const datosUnificados = {
           ...infoData,
           ...compData
         };
         setMed(datosUnificados);
 
-
-        // ENVÍO DE AUDITORÍA (¡Ojo al slash al final!)
         try {
           const payloadAuditoria = {
             medicamento_id: String(id),
@@ -92,7 +88,6 @@ export default function DetalleMedicamento() {
             farmacia: String(compData.farmacia || infoData.farmacia || "Fybeca") 
           };
 
-          // Enviamos el POST al endpoint de auditoría de forma asíncrona
           api.post('/auditoria/', payloadAuditoria)
             .then(res => console.log("Auditoría registrada:", res.data.mensaje))
             .catch(err => console.warn("Error al registrar auditoría en el servidor:", err));
@@ -113,10 +108,9 @@ export default function DetalleMedicamento() {
     if (id) fetchDetalle();
   }, [id]);
 
-  // Pantalla de Carga (Loading)
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F2F2F2] flex flex-col">
+      <div className="min-h-screen flex flex-col bg-transparent">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-10 h-10 border-4 border-azulMedio border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -126,10 +120,9 @@ export default function DetalleMedicamento() {
     );
   }
 
-  // Pantalla de Error Controlada (Evita la pantalla roja de Next.js)
   if (error || !med) {
     return (
-      <div className="min-h-screen bg-[#F2F2F2] flex flex-col">
+      <div className="min-h-screen flex flex-col bg-transparent">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center px-4 text-center">
           <h1 className="text-3xl font-bold text-rojoSemaforo mb-4">¡Ups! Algo salió mal</h1>
@@ -144,72 +137,118 @@ export default function DetalleMedicamento() {
     );
   }
 
-  // Extracción segura de valores numéricos para evitar caídas por strings o nulos
   const limpiarPrecio = (precioRaw: any) => {
     if (!precioRaw) return 0;
     if (typeof precioRaw === 'number') return precioRaw;
     const numeroLimpio = Number(precioRaw.toString().replace(/[^0-9.-]+/g, ""));
-    return isNaN(numeroLimpio) ? 0 : numeroLimpio; // <--- Aquí estaba el error
+    return isNaN(numeroLimpio) ? 0 : numeroLimpio;
   };
 
   const precioTecho = limpiarPrecio(med.precio_techo || med["Precio Techo"]);
   const precioCobrado = limpiarPrecio(med.precio_cobrado || med["Precio Cobrado"]);
   const estadoSemaforo = med.semaforo?.estado || med.estado || "VERDE";
   const porcentaje = med.semaforo?.porcentaje || med.porcentaje || 0;
+  
+  const nombrePrincipal = med.nombre_comercial || med.nombre || med["Principio Activo"] || "MEDICAMENTO";
+  const principio = med.principio_activo || med["Principio Activo"] || "";
+  const concentracion = med.concentracion || med["Concentración"] || "";
 
   return (
-    <div className="min-h-screen bg-[#F2F2F2] text-[#1A1A1A] flex flex-col">
+    <div className="min-h-screen text-[#1A1A1A] flex flex-col bg-transparent">
       <Navbar />
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-12">
-        <div className="bg-white rounded-lg p-8 shadow-[0px_2px_8px_rgba(0,0,0,0.1)] border border-transparent hover:border-azulClaro transition-colors">
-          
-          <Link href="/resultados" className="inline-block mb-6 text-azulMedio hover:text-azulOscuro font-medium text-sm">
-            ← Volver a resultados
-          </Link>
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
+        
+        {/* Enlace de regreso afuera de la tarjeta */}
+        <Link href="/resultados" className="inline-flex items-center mb-6 text-azulOscuro hover:text-azulMedio font-semibold text-[15px] transition-colors">
+          <span className="mr-2">←</span> Volver a resultados
+        </Link>
 
-          {/* TITULO DINÁMICO SEGURO */}
-          <h1 className="text-[32px] font-bold text-azulOscuro mb-2">
-            {med.nombre_comercial || med.nombre || med["Principio Activo"] || "Detalle del Medicamento"}
+        {/* Tarjeta Blanca Principal */}
+        <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border border-gray-100 max-w-2xl mx-auto">
+          
+          <h1 className="text-[32px] md:text-[36px] font-extrabold text-azulOscuro mb-1 uppercase tracking-tight">
+            {nombrePrincipal}
           </h1>
           
-          {/* SUBTÍTULO SEGURO (El punto solo aparece si hay concentración) */}
-          <p className="text-[24px] font-semibold text-[#1A1A1A]/70 mb-8 border-b pb-6">
-            {med.principio_activo || med["Principio Activo"] || "Información base"} 
-            {(med.concentracion || med["Concentración"]) ? ` • ${med.concentracion || med["Concentración"]}` : ""}
+          <p className="text-[18px] text-gray-500 mb-6 uppercase">
+            {principio} {(principio && concentracion) ? '•' : ''} {concentracion}
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="space-y-4 text-[16px] mb-6 sm:mb-0">
-              <div className="flex items-center space-x-3">
-                <span className="text-[#1A1A1A]/60">Precio Techo Oficial:</span>
-                <span className="font-semibold">${precioTecho.toFixed(2)}</span>
+          <hr className="border-gray-200 mb-6" />
+          
+          {/* Bloque de Precios y Semáforo */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-6">
+            <div className="space-y-2 text-[16px]">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600 font-medium w-40">Precio Techo Oficial:</span>
+                <span className="font-bold text-gray-800">${precioTecho.toFixed(2)}</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <span className="text-[#1A1A1A]/60">Precio en Farmacia:</span>
-                <span className="font-semibold text-azulOscuro text-[20px]">${precioCobrado.toFixed(2)}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600 font-medium w-40">Precio en Farmacia:</span>
+                <span className="font-bold text-azulOscuro text-[18px]">${precioCobrado.toFixed(2)}</span>
               </div>
-              
-              {med.ultima_actualizacion && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <span className="text-sm font-medium text-gray-500 italic bg-gray-50 px-3 py-1 rounded-full">
-                    ⏱ Actualizado: {med.ultima_actualizacion}
-                  </span>
-                </div>
-              )}
             </div>
             
-            <div className="flex-shrink-0 scale-110 sm:scale-125 transform origin-left sm:origin-right mt-4 sm:mt-0">
+            <div className="flex-shrink-0 scale-110 origin-left sm:origin-right">
               <SemaforoCard estado={estadoSemaforo as "VERDE" | "ROJO"} porcentaje={porcentaje} />
             </div>
           </div>
-          {/* BOTÓN DE NAVEGACIÓN (Chatbot) */}
-          <div className="mt-10 pt-8 border-t border-gray-200 flex justify-center">
+          
+          <hr className="border-gray-200 mb-6" />
+
+          {/* Información de Farmacia */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 flex items-center justify-center text-azulMedio relative">
+                {med.farmacia === "Cruz Azul" ? (
+                  <Image src="/assets/logo-cruz-azul.png" alt="Cruz Azul" fill sizes="24px" className="object-contain" />
+                ) : med.farmacia === "Fybeca" ? (
+                  <Image src="/assets/logo-fybeca.png" alt="Fybeca" fill sizes="24px" className="object-contain" />
+                ) : (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 11h-3v3h-2v-3H8v-2h3V8h2v3h3v2z"/>
+                  </svg>
+                )}
+              </div>
+              <span className="text-gray-700 font-medium">{med.farmacia || "Farmacia no identificada"}</span>
+            </div>
+            {med.url_producto && med.url_producto !== "#" ? (
+              <a href={med.url_producto} target="_blank" rel="noopener noreferrer" className="text-azulMedio font-semibold text-sm hover:underline flex items-center gap-1">
+                Ver producto →
+              </a>
+            ) : (
+              <span className="text-gray-400 text-sm flex items-center gap-1 cursor-not-allowed">
+                Sin enlace
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+            <Calendar className="w-4 h-4" />
+            <span>Actualizado: {med.ultima_actualizacion || "Fecha no disponible"}</span>
+          </div>
+
+          <hr className="border-gray-200 mb-6" />
+
+          {/* Sección Informativa */}
+          <div className="mb-8">
+            <h3 className="font-bold text-[18px] text-[#1A1A1A] mb-2">¿Qué significa este resultado?</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              El precio cobrado {estadoSemaforo === 'ROJO' ? 'supera el precio techo legal' : 'está dentro del límite legal'}. 
+              Según la normativa ecuatoriana esto {estadoSemaforo === 'ROJO' ? 'puede constituir una infracción.' : 'es correcto.'}
+              {estadoSemaforo === 'ROJO' && ' Te recomendamos consultar con las autoridades competentes.'}
+            </p>
+          </div>
+
+          {/* Botón Asistente IA */}
+          <div className="flex justify-center">
             <Link href="/chatbot">
-              <button className="bg-azulMedio text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:bg-azulOscuro hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
+              <button className="bg-azulMedio text-white font-bold text-[16px] px-8 py-3.5 rounded-xl shadow hover:bg-azulOscuro hover:-translate-y-0.5 transition-all w-full sm:w-auto">
                 Consultar Asistente IA
               </button>
             </Link>
           </div>
+
         </div>
       </main>
     </div>
