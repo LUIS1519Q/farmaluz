@@ -40,19 +40,20 @@ export default function DetalleMedicamento() {
         setLoading(true);
         setError(false);
 
-        let compData = null;
+        let compData: any = {};
         try {
           const compResponse = await api.get(`/comparacion/${id}`);
           compData = compResponse.data;
         } catch (err: any) {
-          setError(true);
           if (err.response && err.response.status === 404) {
-            setMensajeError("Este medicamento aún no tiene precios registrados en la base de datos.");
+            console.warn("Este medicamento aún no tiene precios registrados en la base de datos.");
+            // No detenemos el flujo, dejamos compData vacío y continuamos
           } else {
+            setError(true);
             setMensajeError("No pudimos conectar con el servidor.");
+            setLoading(false);
+            return; 
           }
-          setLoading(false);
-          return; 
         }
 
         let infoData: any = {};
@@ -225,7 +226,11 @@ export default function DetalleMedicamento() {
 
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
             <Calendar className="w-4 h-4" />
-            <span>Actualizado: {med.ultima_actualizacion || "Fecha no disponible"}</span>
+            <span>
+              Actualizado: {med.ultima_actualizacion && med.ultima_actualizacion !== "Fecha no disponible" 
+                ? new Date(med.ultima_actualizacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) 
+                : "Fecha no disponible"}
+            </span>
           </div>
 
           <hr className="border-gray-200 mb-6" />

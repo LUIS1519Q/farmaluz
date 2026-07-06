@@ -26,6 +26,7 @@ function ResultadosContent() {
 
   const [medicamentos, setMedicamentos] = useState<Medicamento[]>([]);
   const [loading, setLoading] = useState(true);
+  const [letraFiltro, setLetraFiltro] = useState<string | null>(null);
 
   // Generamos el alfabeto para el filtro
   const letras = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
@@ -105,7 +106,12 @@ function ResultadosContent() {
                 {letras.map((letra) => (
                   <button
                     key={letra}
-                    className="w-10 h-10 rounded-lg bg-blue-100 text-azulOscuro font-bold hover:bg-azulMedio hover:text-white transition-colors flex items-center justify-center text-sm"
+                    onClick={() => setLetraFiltro(letraFiltro === letra ? null : letra)}
+                    className={`w-10 h-10 rounded-lg font-bold transition-colors flex items-center justify-center text-sm ${
+                      letraFiltro === letra 
+                        ? 'bg-azulMedio text-white shadow-md' 
+                        : 'bg-blue-100 text-azulOscuro hover:bg-azulMedio hover:text-white'
+                    }`}
                   >
                     {letra}
                   </button>
@@ -122,42 +128,55 @@ function ResultadosContent() {
               </div>
             ) : medicamentos.length === 0 ? (
               <p className="text-center text-[#1A1A1A]/70 mt-10">No se encontraron medicamentos para esta búsqueda.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {medicamentos.map((med: any, index: number) => {
-                  const idSeguro = med._id || med.id || Math.random().toString();
-                  const nombre = med["Principio Activo"] || med.nombre_comercial || "Medicamento sin nombre";
-                  const principio = med["Principio Activo"] || "";
-                  const concentracion = med["Concentración "] || med.concentracion || "";
-                  const estadoSemaforo = med.estado_semaforo || "VERDE";
-                  const porcentaje = med.porcentaje_sobreprecio || 0;
+            ) : (() => {
+              const medicamentosMostrados = letraFiltro 
+                ? medicamentos.filter(med => {
+                    const nombre = (med as any)["Principio Activo"] || med.nombre_comercial || "Medicamento";
+                    return nombre.toUpperCase().startsWith(letraFiltro);
+                  })
+                : medicamentos;
 
-                  return (
-                    <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`} className="block h-full">
-                      <div className="bg-white rounded-[16px] p-5 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full flex flex-col justify-between hover:-translate-y-1">
-                        
-                        <div className="mb-4">
-                          <h3 className="text-[17px] font-bold text-[#1A1A1A] leading-tight mb-2 uppercase">
-                            {nombre} {concentracion}
-                          </h3>
-                          <p className="text-[13px] text-gray-500">
-                            Principio activo: <span className="capitalize">{principio.toLowerCase()}</span>
-                          </p>
+              if (medicamentosMostrados.length === 0) {
+                return <p className="text-center text-[#1A1A1A]/70 mt-10">No hay medicamentos que empiecen con la letra {letraFiltro}.</p>;
+              }
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {medicamentosMostrados.map((med: any, index: number) => {
+                    const idSeguro = med._id || med.id || Math.random().toString();
+                    const nombre = med["Principio Activo"] || med.nombre_comercial || "Medicamento sin nombre";
+                    const principio = med["Principio Activo"] || "";
+                    const concentracion = med["Concentración "] || med.concentracion || "";
+                    const estadoSemaforo = med.estado_semaforo || "VERDE";
+                    const porcentaje = med.porcentaje_sobreprecio || 0;
+
+                    return (
+                      <Link href={`/medicamento/${idSeguro}`} key={`${idSeguro}-${index}`} className="block h-full">
+                        <div className="bg-white rounded-[16px] p-5 shadow-md hover:shadow-xl transition-all border border-gray-100 h-full flex flex-col justify-between hover:-translate-y-1">
+                          
+                          <div className="mb-4">
+                            <h3 className="text-[17px] font-bold text-[#1A1A1A] leading-tight mb-2 uppercase">
+                              {nombre} {concentracion}
+                            </h3>
+                            <p className="text-[13px] text-gray-500">
+                              Principio activo: <span className="capitalize">{principio.toLowerCase()}</span>
+                            </p>
+                          </div>
+
+                          <div className="mt-auto">
+                            <SemaforoCard
+                              estado={estadoSemaforo as "VERDE" | "ROJO"}
+                              porcentaje={porcentaje}
+                            />
+                          </div>
+
                         </div>
-
-                        <div className="mt-auto">
-                          <SemaforoCard
-                            estado={estadoSemaforo as "VERDE" | "ROJO"}
-                            porcentaje={porcentaje}
-                          />
-                        </div>
-
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </main>
