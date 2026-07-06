@@ -1,75 +1,73 @@
 import Navbar from '../components/Navbar';
-import { Heart, Shield, Users, Lightbulb } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AcercaDe() {
   return (
-    <div className="min-h-screen bg-[#F2F2F2] text-[#1A1A1A] flex flex-col">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Navbar />
       
-      <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-12">
+      {/* Usamos un contenedor más ancho para que ocupe casi toda la pantalla */}
+      <main className="flex-1 max-w-[1300px] w-full mx-auto px-4 md:px-8 py-12 flex flex-col">
+        
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-azulOscuro mb-4">Acerca de FarmaLuz</h1>
-          <p className="text-lg text-[#1A1A1A]/70 max-w-2xl mx-auto">
-            Iluminando el acceso a la salud con transparencia y tecnología.
+          <h1 className="text-[48px] md:text-[56px] font-extrabold text-azulOscuro mb-2 tracking-tight">
+            Acerca de FarmaLuz
+          </h1>
+          <p className="text-[20px] text-gray-600 max-w-3xl mx-auto font-medium">
+            Iluminando el acceso a la salud con transparencia y tecnología
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="bg-azulMedio/10 p-3 rounded-lg text-azulMedio flex-shrink-0">
-              <Heart className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-azulOscuro mb-2">Nuestro Propósito Social</h2>
-              <p className="text-[#1A1A1A]/80 leading-relaxed">
-                FarmaLuz nace con una misión clara: combatir la especulación de precios en el sector salud en Ecuador. 
-                Nuestra plataforma empodera a los ciudadanos al proporcionarles una herramienta gratuita y de fácil acceso 
-                para comparar los precios reales cobrados en las farmacias contra el precio techo oficial establecido por la ley. 
-                Creemos que el acceso a la medicina a un precio justo es un derecho, no un privilegio.
-              </p>
-            </div>
+        {/* Las 3 tarjetas con sus respectivos brillos */}
+        <div className="grid md:grid-cols-3 gap-8 mb-4 relative z-10">
+          
+          {/* Tarjeta 1 - Brillo Azul */}
+          <div className="bg-white rounded-[24px] p-8 md:p-10 text-center flex flex-col items-center shadow-[0px_0px_25px_rgba(59,130,246,0.4)] border border-blue-100 hover:scale-[1.02] transition-transform">
+             <div className="mb-6 h-40 w-full flex items-center justify-center relative">
+                <Image src="/assets/acerca-transparencia.png" alt="Transparencia" fill className="object-contain" />
+             </div>
+             <h3 className="text-[22px] font-bold text-azulOscuro mb-3">Transparencia</h3>
+             <p className="text-[16px] text-gray-600 leading-relaxed">
+               Comparación de precios reales contra precios techo legales.
+             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mt-10 border-t border-gray-100 pt-8">
-            <div className="flex gap-4">
-              <div className="bg-verdeSemaforo/10 p-3 rounded-lg text-verdeSemaforo flex-shrink-0 h-fit">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Transparencia</h3>
-                <p className="text-sm text-[#1A1A1A]/70">
-                  Extraemos datos reales para que tomes decisiones informadas, mostrando alertas visuales cuando existe un sobreprecio.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="bg-azulMedio/10 p-3 rounded-lg text-azulMedio flex-shrink-0 h-fit">
-                <Lightbulb className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Alternativas Inteligentes</h3>
-                <p className="text-sm text-[#1A1A1A]/70">
-                  Sugerimos opciones genéricas más económicas y brindamos asistencia mediante IA para resolver dudas generales sobre medicamentos.
-                </p>
-              </div>
-            </div>
+          {/* Tarjeta 2 - Brillo Verde */}
+          <div className="bg-white rounded-[24px] p-8 md:p-10 text-center flex flex-col items-center shadow-[0px_0px_25px_rgba(16,185,129,0.4)] border border-green-100 hover:scale-[1.02] transition-transform">
+             <div className="mb-6 h-40 w-full flex items-center justify-center relative">
+                <Image src="/assets/acerca-alternativas.png" alt="Alternativas Inteligentes" fill className="object-contain" />
+             </div>
+             <h3 className="text-[22px] font-bold text-azulOscuro mb-3">Alternativas Inteligentes</h3>
+             <p className="text-[16px] text-gray-600 leading-relaxed">
+               Identificación de genéricos y bioequivalentes con precios justos.
+             </p>
           </div>
+
+          {/* Tarjeta 3 - Brillo Azul Claro */}
+          <div className="bg-white rounded-[24px] p-8 md:p-10 text-center flex flex-col items-center shadow-[0px_0px_25px_rgba(59,130,246,0.3)] border border-blue-100 hover:scale-[1.02] transition-transform">
+             <div className="mb-6 h-40 w-full flex items-center justify-center relative">
+                <Image src="/assets/acerca-proposito.png" alt="Propósito Social" fill className="object-contain" />
+             </div>
+             <h3 className="text-[22px] font-bold text-azulOscuro mb-3">Propósito Social</h3>
+             <p className="text-[16px] text-gray-600 leading-relaxed">
+               Empoderando a la ciudadanía para un consumo responsable de salud.
+             </p>
+          </div>
+
         </div>
 
-        <div className="bg-azulOscuro text-white rounded-xl shadow-sm p-8 text-center">
-          <Users className="w-8 h-8 mx-auto mb-4 text-azulClaro" />
-          <h2 className="text-2xl font-bold mb-4">Desarrollado en la UCE</h2>
-          <p className="text-white/80 max-w-2xl mx-auto text-sm leading-relaxed mb-6">
-            Este proyecto fue desarrollado por el equipo 6 de la materia "Desarrollo de Sistemas de Información"
-            de la carrera de Ingeniería en Sistemas de Información  de la Universidad Central del Ecuador (UCE). 
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm font-medium text-azulClaro">
-            <span>Alex Chicaiza</span>
-            <span>Mateo Males</span>
-            <span>Luis Paspuezan</span>
-            <span>Jordan Sanchez</span>
-            <span>Vanessa Vela</span>
+        {/* Contenedor Inferior - El fondo se aplicará con la imagen que vas a pegar */}
+        <div className="bg-azulOscuro bg-[url('/assets/fondo-uce.png')] bg-cover bg-top bg-no-repeat text-white rounded-[32px] shadow-2xl p-10 md:p-16 text-center relative overflow-hidden flex flex-col justify-end min-h-[350px] mt-8 z-10">
+          <div className="relative z-10 mt-auto">
+            <h2 className="text-[36px] md:text-[44px] font-bold mb-3 tracking-tight">Desarrollado en la UCE</h2>
+            <p className="text-white/90 text-[18px] md:text-[20px] mb-8 font-medium">Universidad Central del Ecuador — Ingeniería en Sistemas</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              {['Alex Chicaiza', 'Mateo Males', 'Luis Paspuezán', 'Jordan Sanchez', 'Vanessa Vela'].map(name => (
+                <span key={name} className="px-5 py-2 bg-transparent rounded-full text-[16px] font-semibold border border-white/40 shadow-sm hover:bg-white/10 transition-colors">
+                  {name}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </main>
