@@ -9,14 +9,14 @@ interface Stats {
   total_medicamentos?: number;
   total_consultas?: number;
   porcentaje_sobreprecio?: number;
-  farmacias_activas?: number;
-  total_fybeca?: number;
-  total_cruzazul?: number;
+  total_farmacias?: number;
+  precios_fybeca?: number;
+  precios_cruz_azul?: number;
 }
 
 interface TopMedicamento {
   nombre: string;
-  consultas: number;
+  cantidad: number;
 }
 
 interface Consulta {
@@ -66,10 +66,10 @@ export default function Dashboard() {
   }, []);
 
   // Funciones auxiliares para gráficas
-  const maxTopValue = topMedicamentos.length > 0 ? Math.max(...topMedicamentos.map(m => m.consultas || 0)) : 100;
+  const maxTopValue = topMedicamentos.length > 0 ? Math.max(...topMedicamentos.map(m => m.cantidad || 0)) : 100;
   
-  const totalPorFarmacia = (stats?.total_fybeca || 0) + (stats?.total_cruzazul || 0);
-  const pctCruzAzul = totalPorFarmacia > 0 ? Math.round(((stats?.total_cruzazul || 0) / totalPorFarmacia) * 100) : 50;
+  const totalPorFarmacia = (stats?.precios_fybeca || 0) + (stats?.precios_cruz_azul || 0);
+  const pctCruzAzul = totalPorFarmacia > 0 ? Math.round(((stats?.precios_cruz_azul || 0) / totalPorFarmacia) * 100) : 50;
   const pctFybeca = totalPorFarmacia > 0 ? 100 - pctCruzAzul : 50;
 
   if (loading) {
@@ -136,7 +136,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h3 className="text-[22px] font-bold text-azulOscuro leading-none mb-1">
-                {stats?.farmacias_activas || 0}
+                {stats?.total_farmacias || 0}
               </h3>
               <p className="text-[11px] text-gray-500 leading-tight uppercase font-medium">Farmacias<br/>Activas</p>
             </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
             
             <div className="space-y-4">
               {topMedicamentos.length > 0 ? topMedicamentos.slice(0,5).map((item, index) => {
-                const widthPct = maxTopValue > 0 ? (item.consultas / maxTopValue) * 100 : 0;
+                const widthPct = maxTopValue > 0 ? (item.cantidad / maxTopValue) * 100 : 0;
                 return (
                   <div key={index} className="flex items-center text-sm">
                     <span className="w-32 text-gray-600 truncate mr-3 font-medium" title={item.nombre}>{item.nombre || 'Desconocido'}</span>
@@ -161,7 +161,7 @@ export default function Dashboard() {
                         className="h-full bg-azulMedio rounded-full transition-all duration-1000" 
                         style={{ width: `${Math.max(widthPct, 2)}%` }}
                       ></div>
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white z-10 mix-blend-difference">{item.consultas}</span>
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white z-10 mix-blend-difference">{item.cantidad}</span>
                     </div>
                   </div>
                 );
@@ -190,14 +190,14 @@ export default function Dashboard() {
                   <div className="w-4 h-4 rounded-full bg-verdeSemaforo shadow-sm"></div>
                   <div>
                     <p className="text-sm font-bold text-gray-700">Cruz Azul</p>
-                    <p className="text-xs text-gray-500">{stats?.total_cruzazul || 0} precios ({pctCruzAzul}%)</p>
+                    <p className="text-xs text-gray-500">{stats?.precios_cruz_azul || 0} precios ({pctCruzAzul}%)</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded-full bg-azulMedio shadow-sm"></div>
                   <div>
                     <p className="text-sm font-bold text-gray-700">Fybeca</p>
-                    <p className="text-xs text-gray-500">{stats?.total_fybeca || 0} precios ({pctFybeca}%)</p>
+                    <p className="text-xs text-gray-500">{stats?.precios_fybeca || 0} precios ({pctFybeca}%)</p>
                   </div>
                 </div>
               </div>
