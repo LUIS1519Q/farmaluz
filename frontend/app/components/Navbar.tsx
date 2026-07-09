@@ -1,89 +1,88 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Pill, Menu, X } from 'lucide-react';
+import { Menu, X, Info, Search, MessageSquare, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
-  const isHome = pathname === '/';
-  const isAcerca = pathname === '/acerca';
-  const isChatbot = pathname === '/chatbot';
-
-  const cerrarMenu = () => setMenuAbierto(false);
+  const navItems = [
+    { name: 'Acerca de', path: '/acerca', icon: Info },
+    { name: 'Buscador', path: '/', icon: Search },
+    { name: 'Chatbot', path: '/chatbot', icon: MessageSquare },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }
+  ];
 
   return (
-    <header className="relative z-[100]">
-      {/* BARRA SUPERIOR FIJA */}
-      <nav className="bg-azulOscuro text-white w-full h-16 shadow-md flex items-center justify-between px-6">
-        <div className="flex items-center space-x-2">
-          <div className="bg-white p-1.5 rounded-md flex items-center justify-center">
-            <Pill className="w-6 h-6 text-verdeSemaforo" />
-          </div>
+    <header className="relative z-[100] w-full bg-white shadow-[0px_2px_15px_rgba(0,0,0,0.05)] border-b border-gray-100">
+      <nav className="w-full flex items-center justify-between px-6 md:px-12 max-w-[1400px] mx-auto py-2">
+        <div className="flex items-center">
           <Link href="/">
-            <span className="text-lg font-bold tracking-wider hover:text-gray-200 transition-colors">
-              FarmaLuz
-            </span>
+            <Image 
+              src="/assets/nuevo-logo-farmaluz.png" 
+              alt="Nuevo Logo FarmaLuz" 
+              width={210} 
+              height={55} 
+              style={{ width: 'auto', height: 'auto' }}
+              className="object-contain"
+              priority
+            />
           </Link>
         </div>
 
-        {/* Botón Móvil */}
         <button
-          type="button"
-          className="md:hidden p-2 rounded-md hover:bg-white/10 transition-colors"
-          style={{ touchAction: 'manipulation' }}
-          aria-expanded={menuAbierto}
-          aria-label="Abrir menú de navegación"
+          className="md:hidden p-2 text-azulOscuro"
           onClick={() => setMenuAbierto(!menuAbierto)}
         >
-          {menuAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {menuAbierto ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
         </button>
 
-        {/* Enlaces de Escritorio */}
-        <div className="hidden md:flex space-x-6 text-[14px] font-medium">
-          {isAcerca ? (
-            <span className="text-white/50 cursor-not-allowed">Acerca de</span>
-          ) : (
-            <Link href="/acerca" className="hover:text-azulClaro transition-colors">Acerca de</Link>
-          )}
-
-          {isHome ? (
-            <span className="text-white/50 cursor-not-allowed">Buscador</span>
-          ) : (
-            <Link href="/" className="hover:text-azulClaro transition-colors">Buscador</Link>
-          )}
-
-          {isChatbot ? (
-            <span className="text-white/50 cursor-not-allowed">Chatbot</span>
-          ) : (
-            <Link href="/chatbot" className="hover:text-azulClaro transition-colors">Chatbot</Link>
-          )}
+        <div className="hidden md:flex space-x-5 text-[17px] font-semibold items-center">
+          {navItems.map((item) => {
+            const isActive = pathname === item.path || (pathname.startsWith('/resultados') && item.path === '/');
+            const Icon = item.icon;
+            
+            return (
+              <Link 
+                key={item.name} 
+                href={item.path} 
+                className={`px-6 py-3 rounded-full border-[2px] transition-all duration-300 flex items-center gap-2 ${
+                  isActive 
+                    ? 'bg-azulMedio text-white border-azulMedio shadow-md' 
+                    : 'bg-white text-azulOscuro border-azulOscuro/20 hover:border-azulMedio hover:text-azulMedio'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
-      {/* MENÚ MÓVIL DESPLEGABLE */}
       {menuAbierto && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-azulOscuro shadow-2xl flex flex-col border-t border-white/10">
-          {isAcerca ? (
-            <span className="text-white/50 font-medium p-4 border-b border-white/10">Acerca de</span>
-          ) : (
-            <Link href="/acerca" onClick={cerrarMenu} className="text-white hover:text-azulClaro font-medium p-4 border-b border-white/10 block">Acerca de</Link>
-          )}
-
-          {isHome ? (
-            <span className="text-white/50 font-medium p-4 border-b border-white/10">Buscador</span>
-          ) : (
-            <Link href="/" onClick={cerrarMenu} className="text-white hover:text-azulClaro font-medium p-4 border-b border-white/10 block">Buscador</Link>
-          )}
-
-          {isChatbot ? (
-            <span className="text-white/50 font-medium p-4 block">Chatbot</span>
-          ) : (
-            <Link href="/chatbot" onClick={cerrarMenu} className="text-white hover:text-azulClaro font-medium p-4 block">Chatbot</Link>
-          )}
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl flex flex-col border-b border-gray-200">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path || (pathname.startsWith('/resultados') && item.path === '/');
+            return (
+              <Link 
+                key={item.name} 
+                href={item.path} 
+                onClick={() => setMenuAbierto(false)} 
+                className={`p-5 border-b border-gray-100 font-semibold text-[17px] flex items-center gap-3 ${
+                  isActive ? 'text-azulOscuro bg-blue-50' : 'text-gray-600'
+                }`}
+              >
+                <Icon className="w-6 h-6" />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
       )}
     </header>
