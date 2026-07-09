@@ -189,6 +189,10 @@ export default function DetalleMedicamento() {
                 <span className="font-bold text-gray-800">${precioTecho.toFixed(2)}</span>
               </div>
               <div className="flex items-center gap-2">
+                <span className="text-gray-600 font-medium w-40">Precio en Farmacia:</span>
+                <span className="font-bold text-azulOscuro text-[18px]">${precioCobrado.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <span className="text-gray-600 font-medium w-40">Precio Promedio:</span>
                 <span className="font-bold text-gray-700">${((precioTecho + precioCobrado) / 2).toFixed(2)}</span>
               </div>
