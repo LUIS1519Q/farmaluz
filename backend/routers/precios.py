@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from database import db
+from backend.database import db
 
 router = APIRouter(
     prefix="/precios",

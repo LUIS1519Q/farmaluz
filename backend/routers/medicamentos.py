@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 
-from database import db
-from models import Medicamento
+from backend.database import db
+from backend.models import Medicamento
 
 router = APIRouter(
     prefix="/medicamentos",

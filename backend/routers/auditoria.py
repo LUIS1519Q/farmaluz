@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
-from database import db
+from backend.database import db
 
 router = APIRouter(tags=["Auditoria"])
 
