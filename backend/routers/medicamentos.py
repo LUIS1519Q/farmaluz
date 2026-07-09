@@ -1,40 +1,39 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from bson import ObjectId
-
+from typing import Optional
 from backend.database import db
-from backend.models import Medicamento
 
 router = APIRouter(
     prefix="/medicamentos",
     tags=["Medicamentos"]
 )
 
-
-@router.get("/genericos/{id}", response_model=Medicamento)
-def obtener_generico(id: int): 
-    generico = db.genericos.find_one({"id": id})
+@router.get("/con-precio")
+def medicamentos_con_precio(farmacia: Optional[str] = Query(None)):
+    filtro = {}
+    if farmacia:
+        filtro["farmacia"] = farmacia
     
-    if not generico:
-        raise HTTPException(status_code=404, detail="Medicamento genérico no encontrado")
+    precios = list(db.precios.find(filtro, {"medicamento_id": 1, "farmacia": 1}))
+    ids = list(set([p["medicamento_id"] for p in precios if "medicamento_id" in p]))
     
-    generico["id"] = generico["id"] 
-    return generico
-
-@router.post("/genericos/")
-def crear_generico(medicamento: Medicamento):
-    # Guardamos específicamente en la colección 'genericos'
-    resultado = db.genericos.insert_one(medicamento.model_dump()) 
-    return {
-        "id": medicamento.id, 
-        "mensaje": "Genérico creado correctamente"
-    }
-
+    medicamentos = []
+    for med_id in ids:
+        try:
+            med = db.medicamentos.find_one({"_id": ObjectId(med_id)})
+            if med:
+                med["_id"] = str(med["_id"])
+                medicamentos.append(med)
+        except:
+            continue
+    
+    return medicamentos
 
 @router.get("/")
 def listar_medicamentos(nombre: str | None = None):
     filtro = {}
     if nombre:
-        filtro["principio_activo"] = {
+        filtro["Principio Activo"] = {
             "$regex": nombre,
             "$options": "i"
         }
@@ -43,7 +42,6 @@ def listar_medicamentos(nombre: str | None = None):
         med["_id"] = str(med["_id"])
         medicamentos.append(med)
     return medicamentos
-
 
 @router.get("/{medicamento_id}")
 def obtener_medicamento(medicamento_id: str):
@@ -57,7 +55,6 @@ def obtener_medicamento(medicamento_id: str):
         )
     medicamento["_id"] = str(medicamento["_id"])
     return medicamento
-
 
 @router.post("/")
 def crear_medicamento(medicamento: dict):
