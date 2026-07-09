@@ -68,6 +68,7 @@ function ResultadosContent() {
             ...med,
             precio_techo: comp.data.precio_techo,
             precio_cobrado: comp.data.precio_cobrado,
+            precio_promedio: (comp.data.precio_techo + comp.data.precio_cobrado) / 2,
             estado_semaforo: comp.data.semaforo?.estado || "VERDE",
             porcentaje_sobreprecio: comp.data.semaforo?.porcentaje || 0,
           };
@@ -274,8 +275,8 @@ function ResultadosContent() {
                               <h3 className="text-[17px] font-bold text-[#1A1A1A] leading-tight mb-2 uppercase">
                                 {nombre} {concentracion}
                               </h3>
-                              <p className="text-[13px] text-gray-500">
-                                Principio activo: <span className="capitalize">{principio.toLowerCase()}</span>
+                              <p className="text-[13px] text-gray-500 mt-1">
+                                Precio promedio: <span className="font-semibold text-azulOscuro">${((med.precio_techo + med.precio_cobrado) / 2).toFixed(2)}</span>
                               </p>
                             </div>
 
