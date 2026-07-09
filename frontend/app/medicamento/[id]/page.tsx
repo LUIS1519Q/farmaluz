@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
@@ -27,7 +27,10 @@ interface DetalleMedicamento {
 
 export default function DetalleMedicamento() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
+  const farmacia = searchParams.get('farmacia');
 
   const [med, setMed] = useState<DetalleMedicamento | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +45,8 @@ export default function DetalleMedicamento() {
 
         let compData: any = {};
         try {
-          const compResponse = await api.get(`/comparacion/${id}`);
+          const compParams = farmacia ? { farmacia } : {};
+          const compResponse = await api.get(`/comparacion/${id}`, { params: compParams });
           compData = compResponse.data;
         } catch (err: any) {
           if (err.response && err.response.status === 404) {
@@ -89,7 +93,7 @@ export default function DetalleMedicamento() {
             farmacia: String(compData.farmacia || infoData.farmacia || "Fybeca") 
           };
 
-          api.post('/auditoria/', payloadAuditoria)
+          api.post('/auditoria', payloadAuditoria)
             .then(res => console.log("Auditoría registrada:", res.data.mensaje))
             .catch(err => console.warn("Error al registrar auditoría en el servidor:", err));
 
@@ -160,9 +164,9 @@ export default function DetalleMedicamento() {
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
         
         {/* Enlace de regreso afuera de la tarjeta */}
-        <Link href="/resultados" className="inline-flex items-center mb-6 text-azulOscuro hover:text-azulMedio font-semibold text-[15px] transition-colors">
+        <button onClick={() => router.back()} className="inline-flex items-center mb-6 text-azulOscuro hover:text-azulMedio font-semibold text-[15px] transition-colors">
           <span className="mr-2">←</span> Volver a resultados
-        </Link>
+        </button>
 
         {/* Tarjeta Blanca Principal */}
         <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border border-gray-100 max-w-2xl mx-auto">
