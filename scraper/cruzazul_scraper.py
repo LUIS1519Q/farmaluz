@@ -1,6 +1,10 @@
+import sys
 import time
 
 from playwright.sync_api import sync_playwright
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from backend.models.precio import Precio
 from backend.services.comparador_service import ComparadorService
@@ -274,6 +278,9 @@ def ejecutar(
     if medicamentos is None:
 
         medicamentos = MedicamentosService.obtener_todos()
+        INICIO = 1     
+        FIN = 300        
+        medicamentos = medicamentos[INICIO:FIN]
 
     total = len(medicamentos)
 

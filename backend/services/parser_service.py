@@ -62,6 +62,72 @@ class ParserService:
 
     ]
 
+    CLAVES_FECHA_ELABORACION = [
+
+        "Fecha de Elaboracion",
+        "Fecha Elaboracion",
+        "Elaboracion",
+        "Fecha de Fabricacion",
+        "Fecha Fabricacion",
+        "Fabricacion",
+
+    ]
+
+    CLAVES_FECHA_VENCIMIENTO = [
+
+        "Fecha de Vencimiento",
+        "Fecha Vencimiento",
+        "Vencimiento",
+        "Fecha de Caducidad",
+        "Fecha Caducidad",
+        "Caducidad",
+
+    ]
+
+    CLAVES_DOSIFICACION = [
+
+        "Dosificacion",
+        "Dosis",
+        "Posologia",
+
+    ]
+
+    CLAVES_TIPO_PRESENTACION = [
+
+        "Tipo de Presentacion",
+        "Presentacion",
+        "Forma Farmaceutica",
+
+    ]
+
+    @staticmethod
+    def buscar_campo(
+        ficha: dict,
+        candidatos: list[str]
+    ) -> str | None:
+
+        if not ficha:
+            return None
+
+        normalizados = {
+
+            ParserService.normalizar(clave): valor
+
+            for clave, valor in ficha.items()
+
+        }
+
+        for candidato in candidatos:
+
+            valor = normalizados.get(
+                ParserService.normalizar(candidato)
+            )
+
+            if valor:
+                return valor
+
+        return None
+
     @staticmethod
     def normalizar(texto: str) -> str:
 

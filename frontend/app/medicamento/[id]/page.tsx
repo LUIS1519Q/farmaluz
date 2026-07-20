@@ -232,11 +232,41 @@ export default function DetalleMedicamento() {
             )}
           </div>
 
+          {med.laboratorio && med.laboratorio !== "No disponible" && (
+            <div className="text-sm text-gray-500 mb-2">
+              Laboratorio: <span className="text-gray-700 font-medium">{med.laboratorio}</span>
+            </div>
+          )}
+
+          {med.tipo_presentacion && med.tipo_presentacion !== "No disponible" && (
+            <div className="text-sm text-gray-500 mb-2">
+              Presentación: <span className="text-gray-700 font-medium">{med.tipo_presentacion}</span>
+            </div>
+          )}
+
+          {med.dosificacion && med.dosificacion !== "No disponible" && (
+            <div className="text-sm text-gray-500 mb-2">
+              Dosificación: <span className="text-gray-700 font-medium">{med.dosificacion}</span>
+            </div>
+          )}
+
+          {med.fecha_elaboracion && med.fecha_elaboracion !== "No disponible" && (
+            <div className="text-sm text-gray-500 mb-2">
+              Fecha de elaboración: <span className="text-gray-700 font-medium">{med.fecha_elaboracion}</span>
+            </div>
+          )}
+
+          {med.fecha_vencimiento && med.fecha_vencimiento !== "No disponible" && (
+            <div className="text-sm text-gray-500 mb-2">
+              Fecha de vencimiento: <span className="text-gray-700 font-medium">{med.fecha_vencimiento}</span>
+            </div>
+          )}
+
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
             <Calendar className="w-4 h-4" />
             <span>
-              Actualizado: {med.ultima_actualizacion && med.ultima_actualizacion !== "Fecha no disponible" 
-                ? new Date(med.ultima_actualizacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) 
+              Actualizado: {med.ultima_actualizacion && med.ultima_actualizacion !== "Fecha no disponible"
+                ? new Date(med.ultima_actualizacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                 : "Fecha no disponible"}
             </span>
           </div>

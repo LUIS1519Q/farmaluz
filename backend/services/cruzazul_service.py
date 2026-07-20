@@ -462,6 +462,12 @@ class CruzAzulService:
 
         try:
 
+            page.locator(
+                ".vtex-tab-layout-0-x-listItem--specification button"
+            ).first.click(
+                timeout=5000
+            )
+
             page.wait_for_selector(
 
                 ".vtex-flex-layout-0-x-flexRow--productSpecification-pdp",
@@ -699,8 +705,30 @@ class CruzAzulService:
                 especificaciones.get("Laboratorio")
             ),
 
-            laboratorio=especificaciones.get(
-                "Laboratorio"
+            laboratorio=(
+                especificaciones.get("Laboratorio")
+                or
+                especificaciones.get("Marca")
+            ),
+
+            fecha_elaboracion=ParserService.buscar_campo(
+                especificaciones,
+                ParserService.CLAVES_FECHA_ELABORACION
+            ),
+
+            fecha_vencimiento=ParserService.buscar_campo(
+                especificaciones,
+                ParserService.CLAVES_FECHA_VENCIMIENTO
+            ),
+
+            dosificacion=ParserService.buscar_campo(
+                especificaciones,
+                ParserService.CLAVES_DOSIFICACION
+            ),
+
+            tipo_presentacion=ParserService.buscar_campo(
+                especificaciones,
+                ParserService.CLAVES_TIPO_PRESENTACION
             ),
 
             precio=cls.calcular_precio_unitario(
