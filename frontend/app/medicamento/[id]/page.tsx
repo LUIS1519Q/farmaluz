@@ -51,12 +51,11 @@ export default function DetalleMedicamento() {
         } catch (err: any) {
           if (err.response && err.response.status === 404) {
             console.warn("Este medicamento aún no tiene precios registrados en la base de datos.");
-            // No detenemos el flujo, dejamos compData vacío y continuamos
           } else {
             setError(true);
             setMensajeError("No pudimos conectar con el servidor.");
             setLoading(false);
-            return; 
+            return;
           }
         }
 
@@ -64,7 +63,7 @@ export default function DetalleMedicamento() {
         try {
           const infoResponse = await api.get(`/medicamentos/${id}`);
           infoData = infoResponse.data.data || infoResponse.data.medicamento || infoResponse.data;
-          if (Array.isArray(infoData)) infoData = infoData[0]; 
+          if (Array.isArray(infoData)) infoData = infoData[0];
         } catch (err) {
           console.warn("No se pudo cargar el nombre del medicamento desde la API");
         }
@@ -77,8 +76,15 @@ export default function DetalleMedicamento() {
         };
 
         const datosUnificados = {
+          ...compData,
           ...infoData,
-          ...compData
+          precio_techo: compData.precio_techo,
+          precio_cobrado: compData.precio_cobrado,
+          semaforo: compData.semaforo,
+          farmacia: compData.farmacia,
+          url_producto: compData.url_producto,
+          ultima_actualizacion: compData.ultima_actualizacion,
+          dosificacion: compData.dosificacion,
         };
         setMed(datosUnificados);
 
@@ -90,7 +96,7 @@ export default function DetalleMedicamento() {
             precio_cobrado: normalizarPrecio(compData.precio_cobrado || compData["Precio Cobrado"]),
             estado_semaforo: String(compData.semaforo?.estado || compData.estado || "VERDE"),
             porcentaje: normalizarPrecio(compData.semaforo?.porcentaje || compData.porcentaje),
-            farmacia: String(compData.farmacia || infoData.farmacia || "Fybeca") 
+            farmacia: String(compData.farmacia || infoData.farmacia || "Fybeca")
           };
 
           api.post('/auditoria', payloadAuditoria)
@@ -153,35 +159,35 @@ export default function DetalleMedicamento() {
   const precioCobrado = limpiarPrecio(med.precio_cobrado || med["Precio Cobrado"]);
   const estadoSemaforo = med.semaforo?.estado || med.estado || "VERDE";
   const porcentaje = med.semaforo?.porcentaje || med.porcentaje || 0;
-  
+
   const nombrePrincipal = med.nombre_comercial || med.nombre || med["Principio Activo"] || "MEDICAMENTO";
   const principio = med.principio_activo || med["Principio Activo"] || "";
-  const concentracion = med.concentracion || med["Concentración"] || "";
+  const concentracion = med["Concentración "] || med.concentracion || "";
+
+  const mg = parseFloat(concentracion.toString().replace(/[^0-9.]/g, ""));
+  const precioPorMg = (mg > 0 && precioCobrado > 0) ? precioCobrado / mg : null;
 
   return (
     <div className="min-h-screen text-[#1A1A1A] flex flex-col bg-transparent">
       <Navbar />
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
-        
-        {/* Enlace de regreso afuera de la tarjeta */}
+
         <button onClick={() => router.back()} className="inline-flex items-center mb-6 text-azulOscuro hover:text-azulMedio font-semibold text-[15px] transition-colors">
           <span className="mr-2">←</span> Volver a resultados
         </button>
 
-        {/* Tarjeta Blanca Principal */}
         <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border border-gray-100 max-w-2xl mx-auto">
-          
+
           <h1 className="text-[32px] md:text-[36px] font-extrabold text-azulOscuro mb-1 uppercase tracking-tight">
             {nombrePrincipal}
           </h1>
-          
+
           <p className="text-[18px] text-gray-500 mb-6 uppercase">
             {principio} {(principio && concentracion) ? '•' : ''} {concentracion}
           </p>
-          
+
           <hr className="border-gray-200 mb-6" />
-          
-          {/* Bloque de Precios y Semáforo */}
+
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-6">
             <div className="space-y-2 text-[16px]">
               <div className="flex items-center gap-2">
@@ -196,16 +202,21 @@ export default function DetalleMedicamento() {
                 <span className="text-gray-600 font-medium w-40">Precio Promedio:</span>
                 <span className="font-bold text-gray-700">${((precioTecho + precioCobrado) / 2).toFixed(2)}</span>
               </div>
+              {precioPorMg !== null && (
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 font-medium w-40">Precio por mg:</span>
+                  <span className="font-bold text-gray-700">${precioPorMg.toFixed(4)}</span>
+                </div>
+              )}
             </div>
-            
+
             <div className="flex-shrink-0 scale-110 origin-left sm:origin-right">
               <SemaforoCard estado={estadoSemaforo as "VERDE" | "ROJO"} porcentaje={porcentaje} />
             </div>
           </div>
-          
+
           <hr className="border-gray-200 mb-6" />
 
-          {/* Información de Farmacia */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 flex items-center justify-center text-azulMedio relative">
@@ -232,34 +243,10 @@ export default function DetalleMedicamento() {
             )}
           </div>
 
-          {med.laboratorio && med.laboratorio !== "No disponible" && (
-            <div className="text-sm text-gray-500 mb-2">
-              Laboratorio: <span className="text-gray-700 font-medium">{med.laboratorio}</span>
-            </div>
-          )}
-
-          {med.tipo_presentacion && med.tipo_presentacion !== "No disponible" && (
-            <div className="text-sm text-gray-500 mb-2">
-              Presentación: <span className="text-gray-700 font-medium">{med.tipo_presentacion}</span>
-            </div>
-          )}
-
           {med.dosificacion && med.dosificacion !== "No disponible" && (
-            <div className="text-sm text-gray-500 mb-2">
-              Dosificación: <span className="text-gray-700 font-medium">{med.dosificacion}</span>
-            </div>
-          )}
-
-          {med.fecha_elaboracion && med.fecha_elaboracion !== "No disponible" && (
-            <div className="text-sm text-gray-500 mb-2">
-              Fecha de elaboración: <span className="text-gray-700 font-medium">{med.fecha_elaboracion}</span>
-            </div>
-          )}
-
-          {med.fecha_vencimiento && med.fecha_vencimiento !== "No disponible" && (
-            <div className="text-sm text-gray-500 mb-2">
-              Fecha de vencimiento: <span className="text-gray-700 font-medium">{med.fecha_vencimiento}</span>
-            </div>
+            <p className="text-sm text-gray-600 mb-2">
+              <span className="font-semibold">Dosificación:</span> {med.dosificacion}
+            </p>
           )}
 
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
@@ -273,17 +260,15 @@ export default function DetalleMedicamento() {
 
           <hr className="border-gray-200 mb-6" />
 
-          {/* Sección Informativa */}
           <div className="mb-8">
             <h3 className="font-bold text-[18px] text-[#1A1A1A] mb-2">¿Qué significa este resultado?</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              El precio cobrado {estadoSemaforo === 'ROJO' ? 'supera el precio techo legal' : 'está dentro del límite legal'}. 
+              El precio cobrado {estadoSemaforo === 'ROJO' ? 'supera el precio techo legal' : 'está dentro del límite legal'}.
               Según la normativa ecuatoriana esto {estadoSemaforo === 'ROJO' ? 'puede constituir una infracción.' : 'es correcto.'}
               {estadoSemaforo === 'ROJO' && ' Te recomendamos consultar con las autoridades competentes.'}
             </p>
           </div>
 
-          {/* Botón Asistente IA */}
           <div className="flex justify-center">
             <Link href="/chatbot">
               <button className="bg-azulMedio text-white font-bold text-[16px] px-8 py-3.5 rounded-xl shadow hover:bg-azulOscuro hover:-translate-y-0.5 transition-all w-full sm:w-auto">
