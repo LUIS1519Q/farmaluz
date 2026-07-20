@@ -33,7 +33,6 @@ class PreciosService:
             "semaforo": "",
             "supera_precio_techo": "",
             "marca": "",
-            "laboratorio": "",
             "presentacion": "",
             "principios_activos": "",
             "concentraciones": "",
@@ -47,6 +46,26 @@ class PreciosService:
             if existente.get("precio_techo") != precio.precio_techo:
 
                 set_sin_fecha["precio_techo"] = precio.precio_techo
+
+            if existente.get("laboratorio") != precio.producto.laboratorio:
+
+                set_sin_fecha["laboratorio"] = precio.producto.laboratorio
+
+            if existente.get("fecha_elaboracion") != precio.producto.fecha_elaboracion:
+
+                set_sin_fecha["fecha_elaboracion"] = precio.producto.fecha_elaboracion
+
+            if existente.get("fecha_vencimiento") != precio.producto.fecha_vencimiento:
+
+                set_sin_fecha["fecha_vencimiento"] = precio.producto.fecha_vencimiento
+
+            if existente.get("dosificacion") != precio.producto.dosificacion:
+
+                set_sin_fecha["dosificacion"] = precio.producto.dosificacion
+
+            if existente.get("tipo_presentacion") != precio.producto.tipo_presentacion:
+
+                set_sin_fecha["tipo_presentacion"] = precio.producto.tipo_presentacion
 
             if any(campo in existente for campo in campos_redundantes) or set_sin_fecha:
 
@@ -90,6 +109,16 @@ class PreciosService:
             "principio_activo": precio.producto.principio_activo,
 
             "concentracion": concentracion,
+
+            "laboratorio": precio.producto.laboratorio,
+
+            "fecha_elaboracion": precio.producto.fecha_elaboracion,
+
+            "fecha_vencimiento": precio.producto.fecha_vencimiento,
+
+            "dosificacion": precio.producto.dosificacion,
+
+            "tipo_presentacion": precio.producto.tipo_presentacion,
 
             "precio": precio.producto.precio,
 
