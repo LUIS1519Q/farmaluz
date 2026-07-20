@@ -368,7 +368,8 @@ class FybecaService:
 
             page.wait_for_selector(
                 "table tbody tr",
-                timeout=5000
+                timeout=5000,
+                state="attached"
             )
 
             filas = page.locator(
@@ -497,6 +498,26 @@ class FybecaService:
 
             "laboratorio": ficha.get(
                 "Laboratorio"
+            ),
+
+            "fecha_elaboracion": ParserService.buscar_campo(
+                ficha,
+                ParserService.CLAVES_FECHA_ELABORACION
+            ),
+
+            "fecha_vencimiento": ParserService.buscar_campo(
+                ficha,
+                ParserService.CLAVES_FECHA_VENCIMIENTO
+            ),
+
+            "dosificacion": ParserService.buscar_campo(
+                ficha,
+                ParserService.CLAVES_DOSIFICACION
+            ),
+
+            "tipo_presentacion": ParserService.buscar_campo(
+                ficha,
+                ParserService.CLAVES_TIPO_PRESENTACION
             )
 
         }
@@ -597,6 +618,24 @@ class FybecaService:
 
             laboratorio=datos[
                 "laboratorio"
+            ] or datos[
+                "marca"
+            ],
+
+            fecha_elaboracion=datos[
+                "fecha_elaboracion"
+            ],
+
+            fecha_vencimiento=datos[
+                "fecha_vencimiento"
+            ],
+
+            dosificacion=datos[
+                "dosificacion"
+            ],
+
+            tipo_presentacion=datos[
+                "tipo_presentacion"
             ],
 
             precio=cls.calcular_precio_unitario(

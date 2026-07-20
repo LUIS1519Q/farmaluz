@@ -22,6 +22,14 @@ class ProductoFarmacia(BaseModel):
 
     laboratorio: Optional[str] = None
 
+    fecha_elaboracion: Optional[str] = None
+
+    fecha_vencimiento: Optional[str] = None
+
+    dosificacion: Optional[str] = None
+
+    tipo_presentacion: Optional[str] = None
+
     precio: float
 
     url: HttpUrl
